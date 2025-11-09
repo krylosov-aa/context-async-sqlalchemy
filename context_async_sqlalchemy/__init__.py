@@ -21,7 +21,7 @@ from .session import (
     close_db_session,
 )
 from .auto_commit import auto_commit_by_status_code
-from .fastapi_utls.middleware import fastapi_db_session_middleware
+from .fastapi_utils.middleware import fastapi_db_session_middleware
 
 __all__ = [
     "init_db_session_ctx",
