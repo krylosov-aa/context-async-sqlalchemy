@@ -1,0 +1,29 @@
+[project]
+name = "fastapi-example"
+version = "0.1.0"
+description = "fastapi-example"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "context-async-sqlalchemy",
+    "sqlalchemy>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "asyncpg>=0.30.0",
+    "fastapi>=0.121.1",
+    "greenlet>=3.2.4",
+    "httpx>=0.28.1",
+    "mypy>=1.18.2",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.12.4",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.4",
+    "wemake-python-styleguide>=0.19.2",
+]
+
+[tool.uv.sources]
+context-async-sqlalchemy = { path = "../../dist/context_async_sqlalchemy-0.1.0-py3-none-any.whl" }
