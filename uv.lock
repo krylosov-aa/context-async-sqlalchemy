@@ -161,8 +161,8 @@ wheels = [
 
 [[package]]
 name = "context-async-sqlalchemy"
-version = "0.1.0"
-source = { virtual = "." }
+version = "1.0.1"
+source = { editable = "." }
 dependencies = [
     { name = "sqlalchemy" },
 ]

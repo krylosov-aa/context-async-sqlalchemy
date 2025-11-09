@@ -1,5 +1,8 @@
 # context-async-sqlalchemy
 
+[![PyPI](https://img.shields.io/pypi/v/my-package.svg)](https://pypi.org/project/context-async-sqlalchemy/)
+
+
 ContextVar + async sqlalchemy = happiness.
 
 A convenient way to configure and interact with async sqlalchemy session
