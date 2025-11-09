@@ -32,12 +32,12 @@ async def some_func() -> None:
 
 The repository includes na example integration with FastAPI,
 which describes numerous workflows.
-[FastAPI example](exmaples/fastapi_example/routes)
+[FastAPI example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/exmaples/fastapi_example/routes)
 
 
 It also includes two types of test setups you can use in your projects.
 
-[FastAPI tests example](exmaples/fastapi_example/tests)
+[FastAPI tests example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/exmaples/fastapi_example/tests)
 
 ### The most basic example
 

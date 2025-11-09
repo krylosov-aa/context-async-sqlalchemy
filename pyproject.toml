@@ -1,8 +1,12 @@
 [project]
 name = "context-async-sqlalchemy"
-version = "0.1.0"
+version = "1.0.0"
 description = "A convenient way to configure and interact with a async sqlalchemy session through context in asynchronous applications"
 readme = "README.md"
+authors = [
+  { name="krylosov-aa", email="krylosov.andrew@gmail.com" }
+]
+license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
     "sqlalchemy>=2.0",
@@ -30,3 +34,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["context_async_sqlalchemy"]
+
+[project.urls]
+Homepage = "https://github.com/krylosov-aa/context-async-sqlalchemy"
