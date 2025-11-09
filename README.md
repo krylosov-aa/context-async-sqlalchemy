@@ -31,7 +31,7 @@ async def some_func() -> None:
 ```
 
 
-## how to use
+## How to use
 
 The repository includes na example integration with FastAPI,
 which describes numerous workflows.
@@ -44,7 +44,7 @@ It also includes two types of test setups you can use in your projects.
 
 ### The most basic example
 
-#### 1. configure the connection to the database
+#### 1. Configure the connection to the database
 
 for example for PostgreSQL:
 
