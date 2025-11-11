@@ -10,3 +10,9 @@ test:
 uv:
 	uv sync
 	source .venv/bin/activate
+
+build:
+	uv build
+
+publish:
+	uv publish

@@ -3,7 +3,7 @@ from typing import Any, AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .connect import create_session
+from .connect import master_connect
 from .context import (
     AsyncCallable,
     AsyncCallableResult,
@@ -24,7 +24,7 @@ async def db_session() -> AsyncSession:
     """
     session = get_db_session_from_context()
     if not session:
-        session = create_session()
+        session = await master_connect.create_session()
         put_db_session_to_context(session)
     return session
 
@@ -126,6 +126,22 @@ async def close_db_session() -> None:
     session = pop_db_session_from_context()
     if session:
         await session.close()
+
+
+@asynccontextmanager
+async def new_non_ctx_session() -> AsyncGenerator[AsyncSession, None]:
+    """Creating a new session without using a context"""
+    session_maker = await master_connect.get_session_maker()
+    async with session_maker() as session:
+        yield session
+
+
+@asynccontextmanager
+async def new_non_ctx_atomic_session() -> AsyncGenerator[AsyncSession, None]:
+    """Creating a new session with transaction without using a context"""
+    async with new_non_ctx_session() as session:
+        async with session.begin():
+            yield session
 
 
 async def _atomic_wrapper(

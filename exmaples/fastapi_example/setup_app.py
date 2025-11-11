@@ -6,7 +6,11 @@ from typing import Any, AsyncGenerator
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from context_async_sqlalchemy import db_connect, fastapi_db_session_middleware
+from context_async_sqlalchemy import (
+    master_connect,
+    replica_connect,
+    fastapi_db_session_middleware,
+)
 
 from .database import create_engine, create_session_maker
 from .routes.atomic_usage import handler_with_db_session_and_atomic
@@ -32,19 +36,17 @@ def setup_app() -> FastAPI:
     )
     setup_middlewares(app)
     setup_routes(app)
-    setup_database()
     return app
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
-    """
-    It is important to clean up resources at the end of an application's
-        life.
-    """
+    """Database connection lifecycle management"""
+    await setup_database()
     yield
     await asyncio.gather(
-        db_connect.close(),  # Close the engine if it was open
+        master_connect.close(),  # Close the engine if it was open
+        replica_connect.close(),  # Close the engine if it was open
     )
 
 
@@ -58,13 +60,14 @@ def setup_middlewares(app: FastAPI) -> None:
     )
 
 
-def setup_database() -> None:
+async def setup_database() -> None:
     """
     Here you pass the database connection parameters to the library.
     More specifically, the engine and session maker.
     """
-    db_connect.engine = create_engine()
-    db_connect.session_maker = create_session_maker(db_connect.engine)
+    master_connect.engine_creator = create_engine
+    master_connect.session_maker_creator = create_session_maker
+    await master_connect.connect("127.0.0.1")
 
 
 def setup_routes(app: FastAPI) -> None:

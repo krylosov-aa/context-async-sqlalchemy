@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .connect import create_session
+from .connect import master_connect
 
 
 def init_db_session_ctx() -> Token[dict[str, AsyncSession] | None]:
@@ -104,6 +104,7 @@ async def _new_ctx_wrapper(
     **kwargs: Any,
 ) -> AsyncCallableResult:
     _init_db_session_ctx()
-    async with create_session() as session:
+    session_maker = await master_connect.get_session_maker()
+    async with session_maker() as session:
         put_db_session_to_context(session)
         return await callable_func(*args, **kwargs)

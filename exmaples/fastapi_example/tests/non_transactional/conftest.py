@@ -52,7 +52,7 @@ async def cleanup_tables_before() -> None:
 
 
 async def _cleanup_tables() -> None:
-    engine = create_engine()
+    engine = create_engine("127.0.0.1")
     session_maker = create_session_maker(engine)
     async with session_maker() as session:
         await session.execute(

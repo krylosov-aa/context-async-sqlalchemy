@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 
-def create_engine() -> AsyncEngine:
+def create_engine(host: str) -> AsyncEngine:
     """
     database connection parameters.
     In production code, you will probably take these parameters from
@@ -19,7 +19,6 @@ def create_engine() -> AsyncEngine:
     pg_user = "krylosov-aa"
     pg_password = ""
     pg_port = 6432
-    host = "localhost"
     pg_db = "test"
     return create_async_engine(
         f"postgresql+asyncpg://"
