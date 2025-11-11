@@ -51,26 +51,45 @@ for example for PostgreSQL:
 ```python
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
+    AsyncEngine,
     AsyncSession,
     create_async_engine,
 )
-from context_async_sqlalchemy import db_connect
 
-db_connect.engine = create_async_engine(
-    f"postgresql+asyncpg://"
-    f"{pg_user}:{pg_password}"
-    f"@{host}:{pg_port}"
-    f"/{pg_db}",
-    future=True,
-    pool_pre_ping=True,
-)
-db_connect.session_maker = async_sessionmaker(
-    db_connect.engine, class_=AsyncSession, expire_on_commit=False
-)
 
+def create_engine(host: str) -> AsyncEngine:
+    """
+    database connection parameters.
+    In production code, you will probably take these parameters from
+        the environment.
+    """
+    pg_user = "krylosov-aa"
+    pg_password = ""
+    pg_port = 6432
+    pg_db = "test"
+    return create_async_engine(
+        f"postgresql+asyncpg://"
+        f"{pg_user}:{pg_password}"
+        f"@{host}:{pg_port}"
+        f"/{pg_db}",
+        future=True,
+        pool_pre_ping=True,
+    )
+
+
+def create_session_maker(
+    engine: AsyncEngine,
+) -> async_sessionmaker[AsyncSession]:
+    """session parameters"""
+    return async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
 ```
 
-#### 2. Close the resources at the end of your application's life
+#### 2. Manage Database connection lifecycle
+Configure the connection to the database at the begin of your application's life. 
+Close the resources at the end of your application's life
+
 
 Example for FastAPI:
 
@@ -79,18 +98,31 @@ import asyncio
 from typing import Any, AsyncGenerator
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from context_async_sqlalchemy import db_connect
+
+from context_async_sqlalchemy import (
+    master_connect,
+    replica_connect,
+)
+
+from .database import create_engine, create_session_maker
+
+async def setup_database() -> None:
+    """
+    Here you pass the database connection parameters to the library.
+    More specifically, the engine and session maker.
+    """
+    master_connect.engine_creator = create_engine
+    master_connect.session_maker_creator = create_session_maker
+    await master_connect.connect("127.0.0.1")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
-    """
-    It is important to clean up resources at the end of an application's
-        life.
-    """
+    """Database connection lifecycle management"""
+    await setup_database()
     yield
     await asyncio.gather(
-        db_connect.close(),  # Close the engine if it was open
-        ...  # other resources in your application
+        master_connect.close(),  # Close the engine if it was open
+        replica_connect.close(),  # Close the engine if it was open
     )
 ```
 
