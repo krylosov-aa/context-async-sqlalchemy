@@ -9,6 +9,9 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+
+from context_async_sqlalchemy import master_connect
 from exmaples.fastapi_example.database import (
     create_engine,
     create_session_maker,
@@ -36,7 +39,8 @@ async def cleanup_tables_after() -> AsyncGenerator[None]:
         database for each worker.
     """
     yield
-    await _cleanup_tables()
+    session_maker = await master_connect.get_session_maker()
+    await _cleanup_tables(session_maker)
 
 
 @pytest_asyncio.fixture(autouse=True, scope="session")
@@ -48,15 +52,18 @@ async def cleanup_tables_before() -> None:
 
     It has its own engine, since the scope is session.
     """
-    await _cleanup_tables()
-
-
-async def _cleanup_tables() -> None:
+    # Since the scope is different, we make a separate engine
     engine = create_engine("127.0.0.1")
     session_maker = create_session_maker(engine)
+    await _cleanup_tables(session_maker)
+    await engine.dispose()
+
+
+async def _cleanup_tables(
+    session_maker: async_sessionmaker[AsyncSession],
+) -> None:
     async with session_maker() as session:
         await session.execute(
             text("TRUNCATE TABLE example RESTART IDENTITY CASCADE;")
         )
         await session.commit()
-    await engine.dispose()

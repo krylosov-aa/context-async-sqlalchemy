@@ -9,11 +9,7 @@ from fastapi import FastAPI
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from context_async_sqlalchemy import master_connect, replica_connect
-from exmaples.fastapi_example.database import (
-    create_engine,
-    create_session_maker,
-)
+from context_async_sqlalchemy import master_connect
 from exmaples.fastapi_example.setup_app import lifespan, setup_app
 
 
@@ -50,17 +46,8 @@ async def db_session_test(
 
 
 @pytest_asyncio.fixture
-async def session_maker_test() -> AsyncGenerator[
-    async_sessionmaker[AsyncSession]
-]:
-    engine = create_engine("127.0.0.1")
-    session_maker = create_session_maker(engine)
+async def session_maker_test(
+    app: FastAPI,  # To make the connection to the database in lifespan
+) -> AsyncGenerator[async_sessionmaker[AsyncSession]]:
+    session_maker = await master_connect.get_session_maker()
     yield session_maker
-    await engine.dispose()
-
-
-@pytest_asyncio.fixture(autouse=True)
-async def close_connect() -> AsyncGenerator[None]:
-    yield
-    await master_connect.close()
-    await replica_connect.close()
