@@ -235,7 +235,7 @@ from master_replica_helper import get_master, get_replica
 
 
 async def renew_master_connect(connect: DBConnect) -> None:
-    """Updates the connection with the master if the master has changed"""
+    """Updates the host if the master has changed"""
     master_host = await get_master()
     if master_host != connect.host:
         await connect.change_host(master_host)
@@ -249,7 +249,7 @@ master = DBConnect(
 
 
 async def renew_replica_connect(connect: DBConnect) -> None:
-    """Updates the connection with the replica if the master has changed"""
+    """Updates the host if the replica has changed"""
     replica_host = await get_replica()
     if replica_host != connect.host:
         await connect.change_host(replica_host)
