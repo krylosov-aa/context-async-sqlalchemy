@@ -34,7 +34,7 @@ async def some_func() -> None:
 
 ## How to use
 
-The repository includes na example integration with FastAPI,
+The repository includes an example integration with FastAPI,
 which describes numerous workflows.
 [FastAPI example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/exmaples/fastapi_example/routes)
 
