@@ -8,18 +8,21 @@ This is fair testing, but slower.
 from typing import AsyncGenerator
 
 import pytest_asyncio
+from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from context_async_sqlalchemy import master_connect
 from exmaples.fastapi_example.database import (
+    master,
     create_engine,
     create_session_maker,
 )
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def cleanup_tables_after() -> AsyncGenerator[None]:
+async def cleanup_tables_after(
+    app: FastAPI,  # To make the connection to the database in lifespan
+) -> AsyncGenerator[None]:
     """
     After each test, we delete all data from the tables to isolate the data.
     We always clear the data after each test to avoid interfering with
@@ -39,7 +42,7 @@ async def cleanup_tables_after() -> AsyncGenerator[None]:
         database for each worker.
     """
     yield
-    session_maker = await master_connect.get_session_maker()
+    session_maker = await master.get_session_maker()
     await _cleanup_tables(session_maker)
 
 

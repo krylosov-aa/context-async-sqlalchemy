@@ -1,18 +1,13 @@
 """Setting up the application"""
 
-import asyncio
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from context_async_sqlalchemy import (
-    master_connect,
-    replica_connect,
-    fastapi_db_session_middleware,
-)
+from context_async_sqlalchemy import fastapi_db_session_middleware
 
-from .database import create_engine, create_session_maker
+from .database import master
 from .routes.atomic_usage import handler_with_db_session_and_atomic
 from .routes.manual_commit import handler_with_db_session_and_manual_close
 from .routes.manual_rollback import handler_with_db_session_and_manual_rollback
@@ -42,12 +37,8 @@ def setup_app() -> FastAPI:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     """Database connection lifecycle management"""
-    await setup_database()
     yield
-    await asyncio.gather(
-        master_connect.close(),  # Close the engine if it was open
-        replica_connect.close(),  # Close the engine if it was open
-    )
+    await master.close()  # Close the engine if it was open
 
 
 def setup_middlewares(app: FastAPI) -> None:
@@ -58,16 +49,6 @@ def setup_middlewares(app: FastAPI) -> None:
     app.add_middleware(
         BaseHTTPMiddleware, dispatch=fastapi_db_session_middleware
     )
-
-
-async def setup_database() -> None:
-    """
-    Here you pass the database connection parameters to the library.
-    More specifically, the engine and session maker.
-    """
-    master_connect.engine_creator = create_engine
-    master_connect.session_maker_creator = create_session_maker
-    await master_connect.connect("127.0.0.1")
 
 
 def setup_routes(app: FastAPI) -> None:

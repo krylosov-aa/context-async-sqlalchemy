@@ -1,6 +1,8 @@
-from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
 
+from context_async_sqlalchemy import db_session
+
+from ..database import master
 from ..models import ExampleTable
 
 
@@ -14,7 +16,7 @@ async def handler_with_db_session() -> None:
     # Created a session (no connection to the database yet)
     # If you call db_session again, it will return the same session
     # even in child coroutines.
-    session = await db_session()
+    session = await db_session(master)
 
     stmt = insert(ExampleTable).values(text="example_with_db_session")
 

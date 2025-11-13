@@ -1,6 +1,7 @@
 from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
 
+from ..database import master
 from ..models import ExampleTable
 
 
@@ -8,7 +9,7 @@ async def handler_with_db_session_and_exception() -> None:
     """
     let's imagine that an exception occurred.
     """
-    session = await db_session()
+    session = await db_session(master)
     stmt = insert(ExampleTable).values(text="example_with_db_session")
     await session.execute(stmt)
     raise Exception("Some exception")

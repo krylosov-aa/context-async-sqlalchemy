@@ -4,13 +4,13 @@ from starlette.middleware.base import (  # type: ignore[attr-defined]
     RequestResponseEndpoint,
 )
 
-from ..auto_commit import auto_commit_by_status_code
-from ..context import (
+from context_async_sqlalchemy import (
     init_db_session_ctx,
     is_context_initiated,
     reset_db_session_ctx,
+    auto_commit_by_status_code,
+    rollback_all_sessions,
 )
-from ..session import rollback_db_session
 
 
 async def fastapi_db_session_middleware(
@@ -40,7 +40,7 @@ async def fastapi_db_session_middleware(
         await auto_commit_by_status_code(response.status_code)
         return response
     except Exception:
-        await rollback_db_session()
+        await rollback_all_sessions()
         raise
     finally:
         await reset_db_session_ctx(token)

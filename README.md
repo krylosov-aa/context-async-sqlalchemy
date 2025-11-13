@@ -14,13 +14,14 @@ A convenient way to configure and interact with async sqlalchemy session
 from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
 
-from ..models import ExampleTable
+from ..database import master  # your configured connection to the database
+from ..models import ExampleTable  # just some model for example
 
 async def some_func() -> None:
     # Created a session (no connection to the database yet)
     # If you call db_session again, it will return the same session
     # even in child coroutines.
-    session = await db_session()
+    session = await db_session(master)
     
     stmt = insert(ExampleTable).values(text="example_with_db_session")
 
@@ -46,8 +47,7 @@ It also includes two types of test setups you can use in your projects.
 
 #### 1. Configure the connection to the database
 
-for example for PostgreSQL:
-
+for example for PostgreSQL database.py:
 ```python
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
@@ -56,13 +56,14 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from context_async_sqlalchemy import DBConnect
+
 
 def create_engine(host: str) -> AsyncEngine:
     """
     database connection parameters.
-    In production code, you will probably take these parameters from
-        the environment.
     """
+    # In production code, you will probably take these parameters from env
     pg_user = "krylosov-aa"
     pg_password = ""
     pg_port = 6432
@@ -84,6 +85,14 @@ def create_session_maker(
     return async_sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )
+
+
+master = DBConnect(
+    host="127.0.0.1",
+    engine_creator=create_engine,
+    session_maker_creator=create_session_maker,
+)
+
 ```
 
 #### 2. Manage Database connection lifecycle
@@ -94,36 +103,18 @@ Close the resources at the end of your application's life
 Example for FastAPI:
 
 ```python
-import asyncio
-from typing import Any, AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator
 from fastapi import FastAPI
 
-from context_async_sqlalchemy import (
-    master_connect,
-    replica_connect,
-)
+from .database import master
 
-from .database import create_engine, create_session_maker
-
-async def setup_database() -> None:
-    """
-    Here you pass the database connection parameters to the library.
-    More specifically, the engine and session maker.
-    """
-    master_connect.engine_creator = create_engine
-    master_connect.session_maker_creator = create_session_maker
-    await master_connect.connect("127.0.0.1")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     """Database connection lifecycle management"""
-    await setup_database()
     yield
-    await asyncio.gather(
-        master_connect.close(),  # Close the engine if it was open
-        replica_connect.close(),  # Close the engine if it was open
-    )
+    await master.close()  # Close the engine if it was open
 ```
 
 
@@ -141,11 +132,11 @@ from starlette.middleware.base import (  # type: ignore[attr-defined]
 )
 
 from context_async_sqlalchemy import (
-    auto_commit_by_status_code,
     init_db_session_ctx,
     is_context_initiated,
     reset_db_session_ctx,
-    rollback_db_session,
+    auto_commit_by_status_code,
+    rollback_all_sessions,
 )
 
 
@@ -161,7 +152,7 @@ async def fastapi_db_session_middleware(
 
     But you can commit or rollback manually in the handler.
     """
-    # Tests may have different session management rules
+    # Tests have different session management rules
     # so if the context variable is already set, we do nothing
     if is_context_initiated():
         return await call_next(request)
@@ -176,7 +167,7 @@ async def fastapi_db_session_middleware(
         await auto_commit_by_status_code(response.status_code)
         return response
     except Exception:
-        await rollback_db_session()
+        await rollback_all_sessions()
         raise
     finally:
         await reset_db_session_ctx(token)
@@ -197,10 +188,13 @@ app.add_middleware(
 #### 4. Write a function that will work with the session
 
 ```python
-from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
 
+from context_async_sqlalchemy import db_session
+
+from ..database import master
 from ..models import ExampleTable
+
 
 async def handler_with_db_session() -> None:
     """
@@ -212,10 +206,58 @@ async def handler_with_db_session() -> None:
     # Created a session (no connection to the database yet)
     # If you call db_session again, it will return the same session
     # even in child coroutines.
-    session = await db_session()
+    session = await db_session(master)
 
     stmt = insert(ExampleTable).values(text="example_with_db_session")
 
     # On the first request, a connection and transaction were opened
     await session.execute(stmt)
+```
+
+
+## Master/Replica or several databases at the same time
+
+This is why `db_session` and other functions accept `DBConnect` as input.
+This way, you can work with multiple hosts simultaneously, 
+for example, with the master and the replica.
+
+
+Let's imagine that you have a third-party functionality that helps determine
+the master or replica.
+
+In this example, the host is not set from the very beginning, but will be
+calculated during the first call to create a session.
+
+```python
+from context_async_sqlalchemy import DBConnect
+
+from master_replica_helper import get_master, get_replica
+
+
+async def renew_master_connect(connect: DBConnect) -> None:
+    """Updates the connection with the master if the master has changed"""
+    master_host = await get_master()
+    if master_host != connect.host:
+        await connect.change_host(master_host)
+
+        
+master = DBConnect(
+    engine_creator=create_engine,
+    session_maker_creator=create_session_maker,
+    before_create_session_handler=renew_master_connect,
+)
+
+
+async def renew_replica_connect(connect: DBConnect) -> None:
+    """Updates the connection with the replica if the master has changed"""
+    replica_host = await get_replica()
+    if replica_host != connect.host:
+        await connect.change_host(replica_host)
+
+        
+replica = DBConnect(
+    engine_creator=create_engine,
+    session_maker_creator=create_session_maker,
+    before_create_session_handler=renew_replica_connect,
+)
 ```

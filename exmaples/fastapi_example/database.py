@@ -9,13 +9,15 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from context_async_sqlalchemy import DBConnect
+
 
 def create_engine(host: str) -> AsyncEngine:
     """
     database connection parameters.
-    In production code, you will probably take these parameters from
-        the environment.
     """
+
+    # In production code, you will probably take these parameters from env
     pg_user = "krylosov-aa"
     pg_password = ""
     pg_port = 6432
@@ -37,3 +39,10 @@ def create_session_maker(
     return async_sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )
+
+
+master = DBConnect(
+    host="127.0.0.1",
+    engine_creator=create_engine,
+    session_maker_creator=create_session_maker,
+)

@@ -1,6 +1,7 @@
 from context_async_sqlalchemy import atomic_db_session, db_session
 from sqlalchemy import insert
 
+from ..database import master
 from ..models import ExampleTable
 
 
@@ -13,12 +14,12 @@ async def handler_with_db_session_and_atomic() -> None:
     """
     # the transaction will be committed or rolled back automatically
     # using the context manager
-    async with atomic_db_session():
+    async with atomic_db_session(master):
         await _insert_1()
 
 
 async def _insert_1() -> None:
-    session = await db_session()
+    session = await db_session(master)
     stmt = insert(ExampleTable).values(
         text="example_with_db_session_and_atomic"
     )

@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from context_async_sqlalchemy import master_connect
+from exmaples.fastapi_example.database import master
 from exmaples.fastapi_example.setup_app import lifespan, setup_app
 
 
@@ -49,5 +49,5 @@ async def db_session_test(
 async def session_maker_test(
     app: FastAPI,  # To make the connection to the database in lifespan
 ) -> AsyncGenerator[async_sessionmaker[AsyncSession]]:
-    session_maker = await master_connect.get_session_maker()
+    session_maker = await master.get_session_maker()
     yield session_maker

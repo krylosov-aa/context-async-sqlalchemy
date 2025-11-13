@@ -7,23 +7,22 @@ from .context import (
     pop_db_session_from_context,
     run_in_new_ctx,
 )
-from .connect import (
-    DBConnect,
-    master_connect,
-    replica_connect,
-)
+from .connect import DBConnect
 from .session import (
     db_session,
     atomic_db_session,
-    run_with_new_db_session,
-    run_with_new_atomic_db_session,
     commit_db_session,
     rollback_db_session,
     close_db_session,
     new_non_ctx_atomic_session,
     new_non_ctx_session,
 )
-from .auto_commit import auto_commit_by_status_code
+from .auto_commit import (
+    auto_commit_by_status_code,
+    commit_all_sessions,
+    rollback_all_sessions,
+    close_all_sessions,
+)
 from .fastapi_utils.middleware import fastapi_db_session_middleware
 
 __all__ = [
@@ -35,17 +34,16 @@ __all__ = [
     "pop_db_session_from_context",
     "run_in_new_ctx",
     "DBConnect",
-    "master_connect",
-    "replica_connect",
     "db_session",
     "atomic_db_session",
-    "run_with_new_db_session",
-    "run_with_new_atomic_db_session",
     "commit_db_session",
     "rollback_db_session",
     "close_db_session",
-    "auto_commit_by_status_code",
-    "fastapi_db_session_middleware",
     "new_non_ctx_atomic_session",
     "new_non_ctx_session",
+    "auto_commit_by_status_code",
+    "commit_all_sessions",
+    "rollback_all_sessions",
+    "close_all_sessions",
+    "fastapi_db_session_middleware",
 ]

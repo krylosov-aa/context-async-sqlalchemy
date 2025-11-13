@@ -13,8 +13,10 @@ On the plus side, these tests run faster.
 from typing import AsyncGenerator
 
 import pytest_asyncio
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from exmaples.fastapi_example.database import master
 from context_async_sqlalchemy import (
     init_db_session_ctx,
     put_db_session_to_context,
@@ -32,8 +34,12 @@ async def db_session_override(
         if it already exists.
     """
     token = init_db_session_ctx()
-    put_db_session_to_context(db_session_test)
+    put_db_session_to_context(master.context_key, db_session_test)
     try:
         yield
     finally:
-        await reset_db_session_ctx(token)
+        await reset_db_session_ctx(
+            token,
+            # Don't close the session here, as you opened in fixture.
+            with_close=False,
+        )

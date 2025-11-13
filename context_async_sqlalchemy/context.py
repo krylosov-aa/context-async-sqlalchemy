@@ -1,14 +1,12 @@
 from contextvars import ContextVar, copy_context, Token
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any, Awaitable, Callable, Generator, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from .connect import master_connect
 
 
 def init_db_session_ctx() -> Token[dict[str, AsyncSession] | None]:
     """
-    Initiates a context for storing the session
+    Initiates a context for storing sessions
     """
     if is_context_initiated():
         raise Exception("Context already initiated")
@@ -23,7 +21,7 @@ def is_context_initiated() -> bool:
     return bool(_db_session_ctx.get())
 
 
-def pop_db_session_from_context() -> AsyncSession | None:
+def pop_db_session_from_context(context_key: str) -> AsyncSession | None:
     """
     Removes a session from the context
     """
@@ -31,37 +29,46 @@ def pop_db_session_from_context() -> AsyncSession | None:
     if not session_ctx:
         return None
 
-    session: AsyncSession | None = session_ctx.pop("session", None)
+    session: AsyncSession | None = session_ctx.pop(context_key, None)
     return session
 
 
 async def reset_db_session_ctx(
-    token: Token[dict[str, AsyncSession] | None],
+    token: Token[dict[str, AsyncSession] | None], with_close: bool = True
 ) -> None:
     """
-    Removes a session from the context and also closes the session if it
+    Removes sessions from the context and also closes the session if it
         is open.
     """
-    session = pop_db_session_from_context()
-    if session:
-        await session.close()
+    if with_close:
+        for session in sessions_stream():
+            await session.close()
     _db_session_ctx.reset(token)
 
 
-def get_db_session_from_context() -> AsyncSession | None:
+def get_db_session_from_context(context_key: str) -> AsyncSession | None:
     """
     Extracts the session from the context
     """
     session_ctx = _get_initiated_context()
-    return session_ctx.get("session")
+    return session_ctx.get(context_key)
 
 
-def put_db_session_to_context(session: AsyncSession) -> None:
+def put_db_session_to_context(
+    context_key: str,
+    session: AsyncSession,
+) -> None:
     """
     Puts the session into context
     """
     session_ctx = _get_initiated_context()
-    session_ctx["session"] = session
+    session_ctx[context_key] = session
+
+
+def sessions_stream() -> Generator[AsyncSession, Any, None]:
+    """Read all open context sessions"""
+    for session in _get_initiated_context().values():
+        yield session
 
 
 AsyncCallableResult = TypeVar("AsyncCallableResult")
@@ -74,11 +81,23 @@ async def run_in_new_ctx(
     **kwargs: Any,
 ) -> AsyncCallableResult:
     """
-    Copies the context and initializes a new context for the new session,
-        then runs the function in the new context.
+    Runs a function in a new context with new sessions that have their
+        own connection.
+    The intended use is to run multiple database queries concurrently.
+
+    example of use:
+        await asyncio.gather(
+          run_in_new_ctx(your_function_with_db_session, ...),
+          run_in_new_ctx(your_function_with_db_session, ...),
+        )
     """
     new_ctx = copy_context()
     return await new_ctx.run(_new_ctx_wrapper, callable_func, *args, **kwargs)
+
+
+_db_session_ctx: ContextVar[dict[str, AsyncSession] | None] = ContextVar(
+    "db_session_ctx", default=None
+)
 
 
 def _get_initiated_context() -> dict[str, AsyncSession]:
@@ -86,11 +105,6 @@ def _get_initiated_context() -> dict[str, AsyncSession]:
     if session_ctx is None:
         raise Exception("Context is not initiated")
     return session_ctx
-
-
-_db_session_ctx: ContextVar[dict[str, AsyncSession] | None] = ContextVar(
-    "db_session_ctx", default=None
-)
 
 
 def _init_db_session_ctx() -> Token[dict[str, AsyncSession] | None]:
@@ -103,8 +117,8 @@ async def _new_ctx_wrapper(
     *args: Any,
     **kwargs: Any,
 ) -> AsyncCallableResult:
-    _init_db_session_ctx()
-    session_maker = await master_connect.get_session_maker()
-    async with session_maker() as session:
-        put_db_session_to_context(session)
+    token = init_db_session_ctx()
+    try:
         return await callable_func(*args, **kwargs)
+    finally:
+        await reset_db_session_ctx(token)
