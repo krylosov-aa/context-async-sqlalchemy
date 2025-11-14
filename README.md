@@ -40,6 +40,9 @@ which describes numerous workflows.
 
 
 It also includes two types of test setups you can use in your projects.
+The library currently has 90% test coverage. The tests are in the
+examples, as we want to test not in the abstract but in the context of a real
+asynchronous web application.
 
 [FastAPI tests example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/exmaples/fastapi_example/tests)
 
