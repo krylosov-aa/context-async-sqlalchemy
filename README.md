@@ -14,8 +14,8 @@ A convenient way to configure and interact with async sqlalchemy session
 from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
 
-from ..database import master  # your configured connection to the database
-from ..models import ExampleTable  # just some model for example
+from database import master  # your configured connection to the database
+from models import ExampleTable  # just some model for example
 
 async def some_func() -> None:
     # Created a session (no connection to the database yet)
