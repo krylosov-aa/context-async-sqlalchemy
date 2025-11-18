@@ -224,9 +224,10 @@ This is why `db_session` and other functions accept `DBConnect` as input.
 This way, you can work with multiple hosts simultaneously, 
 for example, with the master and the replica.
 
-
-Let's imagine that you have a third-party functionality that helps determine
-the master or replica.
+libpq can detect the master and replica to create an engine. However, it only
+does this once during creation. This handler helps change the host on the fly
+if the master or replica changes. Let's imagine that you have a third-party
+functionality that helps determine the master or replica. 
 
 In this example, the host is not set from the very beginning, but will be
 calculated during the first call to create a session.
