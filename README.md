@@ -110,7 +110,7 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 from fastapi import FastAPI
 
-from .database import master
+from database import master
 
 
 @asynccontextmanager
@@ -195,8 +195,8 @@ from sqlalchemy import insert
 
 from context_async_sqlalchemy import db_session
 
-from ..database import master
-from ..models import ExampleTable
+from database import master
+from models import ExampleTable
 
 
 async def handler_with_db_session() -> None:

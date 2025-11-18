@@ -5,6 +5,8 @@ from context_async_sqlalchemy import (
     close_db_session,
     commit_db_session,
     db_session,
+    new_non_ctx_atomic_session,
+    new_non_ctx_session,
     run_in_new_ctx,
 )
 from sqlalchemy import insert
@@ -21,9 +23,8 @@ async def handler_multiple_sessions() -> None:
     await asyncio.gather(
         run_in_new_ctx(_insert),
         run_in_new_ctx(_insert_manual),
-        run_in_new_ctx(_insert),
-        run_in_new_ctx(_insert_manual),
-        run_in_new_ctx(_insert),
+        _insert_non_ctx(),
+        _insert_non_ctx_manual(),
     )
 
 
@@ -41,3 +42,16 @@ async def _insert_manual() -> None:
 
     # You can manually close the session if you want, but it is not necessary
     await close_db_session(master)
+
+
+async def _insert_non_ctx() -> None:
+    async with new_non_ctx_atomic_session(master) as session:
+        stmt = insert(ExampleTable).values(text="example_multiple_sessions")
+        await session.execute(stmt)
+
+
+async def _insert_non_ctx_manual() -> None:
+    async with new_non_ctx_session(master) as session:
+        stmt = insert(ExampleTable).values(text="example_multiple_sessions")
+        await session.execute(stmt)
+        await session.commit()
