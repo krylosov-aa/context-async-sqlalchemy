@@ -98,7 +98,7 @@ async def test_example_multiple_sessions(
 
     result = await db_session_test.execute(select(ExampleTable))
     rows = result.scalars().all()
-    assert len(rows) == 4
+    assert len(rows) == 5
     for row in rows:
         assert row.text == "example_multiple_sessions"
 

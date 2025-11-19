@@ -21,6 +21,7 @@ async def handler_multiple_sessions() -> None:
         simultaneously. For example, to run several queries concurrently.
     """
     await asyncio.gather(
+        _insert(),
         run_in_new_ctx(_insert),
         run_in_new_ctx(_insert_manual),
         _insert_non_ctx(),

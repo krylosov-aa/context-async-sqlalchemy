@@ -117,7 +117,7 @@ async def _new_ctx_wrapper(
     *args: Any,
     **kwargs: Any,
 ) -> AsyncCallableResult:
-    token = init_db_session_ctx()
+    token = _init_db_session_ctx()
     try:
         return await callable_func(*args, **kwargs)
     finally:
