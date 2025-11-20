@@ -13,15 +13,13 @@ On the plus side, these tests run faster.
 from typing import AsyncGenerator
 
 import pytest_asyncio
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exmaples.fastapi_example.database import master
-from context_async_sqlalchemy import (
-    init_db_session_ctx,
-    put_db_session_to_context,
-    reset_db_session_ctx,
+from context_async_sqlalchemy.test_utils import (
+    put_savepoint_session_in_ctx,
+    set_test_context,
 )
+from exmaples.fastapi_example.database import master
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -33,21 +31,6 @@ async def db_session_override(
     The middleware has a special check that won't initialize the context
         if it already exists.
     """
-    token = init_db_session_ctx()
-
-    # Here we create a new session with save point behavior.
-    # This means that committing within the application will save and
-    #   release the save point, rather than committing the entire transaction.
-    conn = await db_session_test.connection()
-    new_session = AsyncSession(
-        bind=conn, join_transaction_mode="create_savepoint"
-    )
-    put_db_session_to_context(master.context_key, new_session)
-    try:
-        yield
-    finally:
-        await reset_db_session_ctx(
-            token,
-            # Don't close the session here, as you opened in fixture.
-            with_close=False,
-        )
+    async with set_test_context():
+        async with put_savepoint_session_in_ctx(master, db_session_test):
+            yield

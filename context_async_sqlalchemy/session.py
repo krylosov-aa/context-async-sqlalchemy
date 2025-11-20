@@ -22,7 +22,7 @@ async def db_session(connect: DBConnect) -> AsyncSession:
     session = get_db_session_from_context(connect.context_key)
     if not session:
         session = await connect.create_session()
-        put_db_session_to_context(connect.context_key, session)
+        put_db_session_to_context(connect, session)
     return session
 
 

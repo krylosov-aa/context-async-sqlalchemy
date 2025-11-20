@@ -3,6 +3,8 @@ from typing import Any, Awaitable, Callable, Generator, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .connect import DBConnect
+
 
 def init_db_session_ctx() -> Token[dict[str, AsyncSession] | None]:
     """
@@ -55,14 +57,14 @@ def get_db_session_from_context(context_key: str) -> AsyncSession | None:
 
 
 def put_db_session_to_context(
-    context_key: str,
+    connection: DBConnect,
     session: AsyncSession,
 ) -> None:
     """
     Puts the session into context
     """
     session_ctx = _get_initiated_context()
-    session_ctx[context_key] = session
+    session_ctx[connection.context_key] = session
 
 
 def sessions_stream() -> Generator[AsyncSession, Any, None]:
