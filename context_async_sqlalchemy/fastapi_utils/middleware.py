@@ -1,7 +1,8 @@
-from fastapi import Request
+from fastapi import FastAPI, Request
 from starlette.middleware.base import (  # type: ignore[attr-defined]
     Response,
     RequestResponseEndpoint,
+    BaseHTTPMiddleware,
 )
 
 from context_async_sqlalchemy import (
@@ -11,6 +12,13 @@ from context_async_sqlalchemy import (
     auto_commit_by_status_code,
     rollback_all_sessions,
 )
+
+
+def add_fastapi_db_session_middleware(app: FastAPI) -> None:
+    """Adds middleware to the application"""
+    app.add_middleware(
+        BaseHTTPMiddleware, dispatch=fastapi_db_session_middleware
+    )
 
 
 async def fastapi_db_session_middleware(

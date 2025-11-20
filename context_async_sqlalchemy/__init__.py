@@ -23,7 +23,10 @@ from .auto_commit import (
     rollback_all_sessions,
     close_all_sessions,
 )
-from .fastapi_utils.middleware import fastapi_db_session_middleware
+from .fastapi_utils import (
+    fastapi_db_session_middleware,
+    add_fastapi_db_session_middleware,
+)
 
 __all__ = [
     "init_db_session_ctx",
@@ -46,4 +49,5 @@ __all__ = [
     "rollback_all_sessions",
     "close_all_sessions",
     "fastapi_db_session_middleware",
+    "add_fastapi_db_session_middleware",
 ]

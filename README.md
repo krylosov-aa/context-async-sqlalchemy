@@ -179,12 +179,12 @@ async def fastapi_db_session_middleware(
 
 You can use ready-made FastAPI middleware:
 ```python
-from context_async_sqlalchemy import fastapi_db_session_middleware
-from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import FastAPI
+from context_async_sqlalchemy import add_fastapi_db_session_middleware
 
-app.add_middleware(
-    BaseHTTPMiddleware, dispatch=fastapi_db_session_middleware
-)
+app = FastAPI()
+
+add_fastapi_db_session_middleware(app)
 ```
 
 

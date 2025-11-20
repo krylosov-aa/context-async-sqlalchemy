@@ -3,9 +3,8 @@
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 from fastapi import FastAPI
-from starlette.middleware.base import BaseHTTPMiddleware
 
-from context_async_sqlalchemy import fastapi_db_session_middleware
+from context_async_sqlalchemy import add_fastapi_db_session_middleware
 
 from .database import master
 from .routes.atomic_usage import handler_with_db_session_and_atomic
@@ -29,7 +28,7 @@ def setup_app() -> FastAPI:
     app = FastAPI(
         lifespan=lifespan,
     )
-    setup_middlewares(app)
+    add_fastapi_db_session_middleware(app)
     setup_routes(app)
     return app
 
@@ -39,16 +38,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     """Database connection lifecycle management"""
     yield
     await master.close()  # Close the engine if it was open
-
-
-def setup_middlewares(app: FastAPI) -> None:
-    """
-    The middleware will be responsible for initializing the context.
-    And will also be responsible for autocommit or autorollback.
-    """
-    app.add_middleware(
-        BaseHTTPMiddleware, dispatch=fastapi_db_session_middleware
-    )
 
 
 def setup_routes(app: FastAPI) -> None:
