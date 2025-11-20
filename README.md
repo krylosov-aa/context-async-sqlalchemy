@@ -126,6 +126,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
 For a contextual session to work, a context needs to be set. This assumes some
 kind of middleware.
 
+
+You can use ready-made FastAPI middleware:
+```python
+from fastapi import FastAPI
+from context_async_sqlalchemy import add_fastapi_db_session_middleware
+
+app = FastAPI()
+
+add_fastapi_db_session_middleware(app)
+```
+
+
 I'll use FastAPI middleware as an example:
 ```python
 from fastapi import Request
@@ -174,17 +186,6 @@ async def fastapi_db_session_middleware(
         raise
     finally:
         await reset_db_session_ctx(token)
-```
-
-
-You can use ready-made FastAPI middleware:
-```python
-from fastapi import FastAPI
-from context_async_sqlalchemy import add_fastapi_db_session_middleware
-
-app = FastAPI()
-
-add_fastapi_db_session_middleware(app)
 ```
 
 
