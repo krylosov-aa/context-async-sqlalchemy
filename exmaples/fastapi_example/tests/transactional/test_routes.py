@@ -36,3 +36,25 @@ async def test_example_with_db_session(
     result = await db_session_test.execute(select(ExampleTable))
     row = result.scalar_one()
     assert row.text == "example_with_db_session"
+
+
+@pytest.mark.asyncio
+async def test_example_with_db_session_and_atomic(
+    client: AsyncClient,
+    db_session_test: AsyncSession,
+) -> None:
+    """
+    Since the handler involves manual session management,
+        such a handler should only be tested in non-transactional tests.
+    """
+    # Act
+    response = await client.post(
+        "/example_with_db_session_and_atomic",
+    )
+
+    # Assert
+    assert response.status_code == HTTPStatus.OK
+
+    result = await db_session_test.execute(select(ExampleTable))
+    row = result.scalar_one()
+    assert row.text == "example_with_db_session_and_atomic"

@@ -14,7 +14,7 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from exmaples.fastapi_example.database import master
 from context_async_sqlalchemy import (
@@ -22,6 +22,18 @@ from context_async_sqlalchemy import (
     put_db_session_to_context,
     reset_db_session_ctx,
 )
+
+
+@pytest_asyncio.fixture
+async def db_session_test(
+    session_maker_test: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncSession]:
+    """The session that is used inside the test"""
+    async with session_maker_test() as session:
+        try:
+            yield session
+        finally:
+            await session.rollback()
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -34,7 +46,15 @@ async def db_session_override(
         if it already exists.
     """
     token = init_db_session_ctx()
-    put_db_session_to_context(master.context_key, db_session_test)
+
+    # Here we create a new session with save point behavior.
+    # This means that committing within the application will save and
+    #   release the save point, rather than committing the entire transaction.
+    conn = await db_session_test.connection()
+    new_session = AsyncSession(
+        bind=conn, join_transaction_mode="create_savepoint"
+    )
+    put_db_session_to_context(master.context_key, new_session)
     try:
         yield
     finally:
