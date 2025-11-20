@@ -14,7 +14,7 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from exmaples.fastapi_example.database import master
 from context_async_sqlalchemy import (
@@ -22,18 +22,6 @@ from context_async_sqlalchemy import (
     put_db_session_to_context,
     reset_db_session_ctx,
 )
-
-
-@pytest_asyncio.fixture
-async def db_session_test(
-    session_maker_test: async_sessionmaker[AsyncSession],
-) -> AsyncGenerator[AsyncSession]:
-    """The session that is used inside the test"""
-    async with session_maker_test() as session:
-        try:
-            yield session
-        finally:
-            await session.rollback()
 
 
 @pytest_asyncio.fixture(autouse=True)
