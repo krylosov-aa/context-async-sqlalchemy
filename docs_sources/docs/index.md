@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/context-async-sqlalchemy.svg)](https://pypi.org/project/context-async-sqlalchemy/)
 
-[DOCUMENTATION](https://krylosov-aa.github.io/context-async-sqlalchemy/)
+[SOURCE CODE](https://github.com/krylosov-aa/context-async-sqlalchemy)
 
 Provides a super convenient way to work with sqlalchemy in asynchronous
 applications. It takes care of the issues of managing the lifecycle of engine,
@@ -24,7 +24,6 @@ transactions when needed.
 - Host switching in runtime
 - It can manage multiple databases and multiple sessions to a single database
 - Provides tools for concurrent sql queries
-- Lazy initialization is everywhere
 
 
 ## What does usage look like?
@@ -59,7 +58,7 @@ async def some_func() -> None:
 
 Here is a very simplified diagram of how everything works:
 
-![basic schema.png](docs_sources/docs/img/basic_schema.png)
+![basic schema.png](img/basic_schema.png)
 
 1. Before executing your code, the middleware will prepare a container in
 which the sessions required by your code will be stored.

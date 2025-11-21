@@ -1,4 +1,0 @@
-site_name: context-async-sqlalchemy
-#site_url: https://krylosov-aa.github.io/context-async-sqlalchemy/
-theme:
-  name: readthedocs

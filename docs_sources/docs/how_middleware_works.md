@@ -1,4 +1,13 @@
-from starlette.applications import Starlette
+# How middleware works
+
+The biggest part of the work and magic happens in middleware.
+The library strives to provide ready-made solutions so that you don't have to
+worry. But they are not always there.
+Therefore, we will tell you how starlette middleware works,
+using the example of which you can write your own.
+
+
+```python
 from starlette.middleware.base import (  # type: ignore[attr-defined]
     Request,
     Response,
@@ -13,14 +22,6 @@ from context_async_sqlalchemy import (
     auto_commit_by_status_code,
     rollback_all_sessions,
 )
-
-
-def add_starlette_http_db_session_middleware(app: Starlette) -> None:
-    """Adds middleware to the application"""
-    app.add_middleware(
-        BaseHTTPMiddleware, dispatch=starlette_http_db_session_middleware
-    )
-
 
 async def starlette_http_db_session_middleware(
     request: Request, call_next: RequestResponseEndpoint
@@ -56,3 +57,4 @@ async def starlette_http_db_session_middleware(
     finally:
         # Close all sessions and clear the context
         await reset_db_session_ctx(token)
+```

@@ -1,0 +1,12 @@
+site_name: context-async-sqlalchemy
+repo_url: https://github.com/krylosov-aa/context-async-sqlalchemy
+theme:
+  name: readthedocs
+  navigation_depth: 2
+  collapse_navigation: true
+nav:
+  - context-async-sqlalchemy: index.md
+  - Getting started: getting_started.md
+  - Master/Replica or several databases at the same time: master_replica.md
+  - Testing: testing.md
+  - How middleware works: how_middleware_works.md
