@@ -1,7 +1,7 @@
 from context_async_sqlalchemy import db_session, rollback_db_session
 from sqlalchemy import insert
 
-from ..database import master
+from ..database import connection
 from ..models import ExampleTable
 
 
@@ -11,16 +11,16 @@ async def handler_with_db_session_and_manual_rollback() -> None:
     """
     # it's convenient this way
     await _insert()
-    await rollback_db_session(master)
+    await rollback_db_session(connection)
 
     # but it's possible this way too
     await _insert()
-    session = await db_session(master)
+    session = await db_session(connection)
     await session.rollback()
 
 
 async def _insert() -> None:
-    session = await db_session(master)
+    session = await db_session(connection)
     stmt = insert(ExampleTable).values(
         text="example_with_db_session_and_manual_close"
     )

@@ -19,7 +19,7 @@ from context_async_sqlalchemy.test_utils import (
     put_savepoint_session_in_ctx,
     set_test_context,
 )
-from exmaples.fastapi_example.database import master
+from examples.fastapi_example.database import connection
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -32,5 +32,5 @@ async def db_session_override(
         if it already exists.
     """
     async with set_test_context():
-        async with put_savepoint_session_in_ctx(master, db_session_test):
+        async with put_savepoint_session_in_ctx(connection, db_session_test):
             yield

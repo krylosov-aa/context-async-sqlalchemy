@@ -12,7 +12,7 @@ from httpx import AsyncClient
 from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exmaples.fastapi_example.models import ExampleTable
+from examples.fastapi_example.models import ExampleTable
 
 
 @pytest.mark.asyncio
@@ -51,8 +51,10 @@ async def test_example_with_db_session_and_atomic(
     assert response.status_code == HTTPStatus.OK
 
     result = await db_session_test.execute(select(ExampleTable))
-    row = result.scalar_one()
-    assert row.text == "example_with_db_session_and_atomic"
+    rows = result.scalars().all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.text == "example_with_db_session_and_atomic"
 
 
 @pytest.mark.asyncio
@@ -165,3 +167,23 @@ async def test_example_with_http_exception(
         select(exists().select_from(ExampleTable))
     )
     assert exist_row.scalar() is False
+
+
+@pytest.mark.asyncio
+async def test_example_with_early_connection_close(
+    client: AsyncClient,
+    db_session_test: AsyncSession,
+) -> None:
+    # Act
+    response = await client.post(
+        "/example_with_early_connection_close",
+    )
+
+    # Assert
+    assert response.status_code == HTTPStatus.OK
+
+    result = await db_session_test.execute(select(ExampleTable))
+    rows = result.scalars().all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.text == "example_with_early_connection_close"

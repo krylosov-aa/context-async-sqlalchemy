@@ -4,13 +4,16 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 from fastapi import FastAPI
 
-from context_async_sqlalchemy import add_fastapi_db_session_middleware
+from context_async_sqlalchemy.fastapi_utils import (
+    add_fastapi_http_db_session_middleware,
+)
 
-from .database import master
+from .database import connection
 from .routes.atomic_usage import handler_with_db_session_and_atomic
 from .routes.manual_commit import handler_with_db_session_and_manual_close
 from .routes.manual_rollback import handler_with_db_session_and_manual_rollback
 from .routes.multiple_session_usage import handler_multiple_sessions
+from .routes.early_connection_close import handler_with_early_connection_close
 
 from .routes.simple_usage import handler_with_db_session
 from .routes.simple_with_exception import handler_with_db_session_and_exception
@@ -28,7 +31,7 @@ def setup_app() -> FastAPI:
     app = FastAPI(
         lifespan=lifespan,
     )
-    add_fastapi_db_session_middleware(app)
+    add_fastapi_http_db_session_middleware(app)
     setup_routes(app)
     return app
 
@@ -37,7 +40,7 @@ def setup_app() -> FastAPI:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     """Database connection lifecycle management"""
     yield
-    await master.close()  # Close the engine if it was open
+    await connection.close()  # Close the engine if it was open
 
 
 def setup_routes(app: FastAPI) -> None:
@@ -78,5 +81,10 @@ def setup_routes(app: FastAPI) -> None:
     app.add_api_route(
         "/example_with_http_exception",
         handler_with_db_session_and_http_exception,
+        methods=["POST"],
+    )
+    app.add_api_route(
+        "/example_with_early_connection_close",
+        handler_with_early_connection_close,
         methods=["POST"],
     )

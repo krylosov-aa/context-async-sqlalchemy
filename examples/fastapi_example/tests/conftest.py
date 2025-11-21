@@ -10,8 +10,8 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from context_async_sqlalchemy.test_utils import rollback_session
-from exmaples.fastapi_example.database import master
-from exmaples.fastapi_example.setup_app import lifespan, setup_app
+from examples.fastapi_example.database import connection
+from examples.fastapi_example.setup_app import lifespan, setup_app
 
 
 @pytest_asyncio.fixture
@@ -37,5 +37,5 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient]:
 @pytest_asyncio.fixture
 async def db_session_test() -> AsyncGenerator[AsyncSession]:
     """The session that is used inside the test"""
-    async with rollback_session(master) as session:
+    async with rollback_session(connection) as session:
         yield session

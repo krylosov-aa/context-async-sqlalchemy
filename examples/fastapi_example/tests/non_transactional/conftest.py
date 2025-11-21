@@ -12,8 +12,8 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from exmaples.fastapi_example.database import (
-    master,
+from examples.fastapi_example.database import (
+    connection,
     create_engine,
     create_session_maker,
 )
@@ -42,7 +42,7 @@ async def cleanup_tables_after(
         database for each worker.
     """
     yield
-    session_maker = await master.get_session_maker()
+    session_maker = await connection.session_maker()
     await _cleanup_tables(session_maker)
 
 

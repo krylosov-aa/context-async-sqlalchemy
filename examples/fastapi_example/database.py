@@ -41,7 +41,7 @@ def create_session_maker(
     )
 
 
-master = DBConnect(
+connection = DBConnect(
     host="127.0.0.1",
     engine_creator=create_engine,
     session_maker_creator=create_session_maker,
