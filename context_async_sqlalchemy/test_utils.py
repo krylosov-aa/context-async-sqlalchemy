@@ -18,7 +18,7 @@ async def rollback_session(
     connection: DBConnect,
 ) -> AsyncGenerator[AsyncSession]:
     """A session that always rolls back"""
-    session_maker = await connection.get_session_maker()
+    session_maker = await connection.session_maker()
     async with session_maker() as session:
         try:
             yield session
@@ -55,7 +55,7 @@ async def put_savepoint_session_in_ctx(
 
     It is also important to use this function inside set_test_context.
     """
-    session_maker = await connection.get_session_maker()
+    session_maker = await connection.session_maker()
     async with session_maker(
         # Bind to the same connection
         bind=await session.connection(),

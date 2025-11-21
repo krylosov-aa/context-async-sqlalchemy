@@ -5,7 +5,6 @@ from .context import (
     get_db_session_from_context,
     put_db_session_to_context,
     pop_db_session_from_context,
-    run_in_new_ctx,
 )
 from .connect import DBConnect
 from .session import (
@@ -23,9 +22,15 @@ from .auto_commit import (
     rollback_all_sessions,
     close_all_sessions,
 )
+from .run_in_new_context import run_in_new_ctx
+from .starlette_utils import (
+    add_starlette_http_db_session_middleware,
+    starlette_http_db_session_middleware,
+)
+
 from .fastapi_utils import (
-    fastapi_db_session_middleware,
-    add_fastapi_db_session_middleware,
+    fastapi_http_db_session_middleware,
+    add_fastapi_http_db_session_middleware,
 )
 
 __all__ = [
@@ -48,6 +53,8 @@ __all__ = [
     "commit_all_sessions",
     "rollback_all_sessions",
     "close_all_sessions",
-    "fastapi_db_session_middleware",
-    "add_fastapi_db_session_middleware",
+    "add_starlette_http_db_session_middleware",
+    "starlette_http_db_session_middleware",
+    "fastapi_http_db_session_middleware",
+    "add_fastapi_http_db_session_middleware",
 ]

@@ -36,7 +36,7 @@ async def some_func() -> None:
 
 The repository includes an example integration with FastAPI,
 which describes numerous workflows.
-[FastAPI example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/exmaples/fastapi_example/routes)
+[FastAPI example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes)
 
 
 It also includes two types of test setups you can use in your projects.
@@ -44,7 +44,7 @@ The library currently has 90% test coverage. The tests are in the
 examples, as we want to test not in the abstract but in the context of a real
 asynchronous web application.
 
-[FastAPI tests example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/exmaples/fastapi_example/tests)
+[FastAPI tests example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests)
 
 ### The most basic example
 
@@ -278,7 +278,7 @@ achieved through fast transaction rollback.
 You can see the capabilities in the examples:
 
 [Here are tests with a common transaction between the
-application and the tests.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/exmaples/fastapi_example/tests/transactional/__init__.py)
+application and the tests.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/transactional/__init__.py)
 
 
-[And here's an example with different transactions.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/exmaples/fastapi_example/tests/non_transactional/__init__.py)
+[And here's an example with different transactions.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/non_transactional/__init__.py)

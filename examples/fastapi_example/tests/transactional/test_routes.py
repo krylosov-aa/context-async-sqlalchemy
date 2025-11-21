@@ -17,7 +17,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exmaples.fastapi_example.models import ExampleTable
+from examples.fastapi_example.models import ExampleTable
 
 
 @pytest.mark.asyncio
@@ -56,5 +56,7 @@ async def test_example_with_db_session_and_atomic(
     assert response.status_code == HTTPStatus.OK
 
     result = await db_session_test.execute(select(ExampleTable))
-    row = result.scalar_one()
-    assert row.text == "example_with_db_session_and_atomic"
+    rows = result.scalars().all()
+    assert len(rows) == 2
+    for row in rows:
+        assert row.text == "example_with_db_session_and_atomic"

@@ -99,7 +99,7 @@ async def new_non_ctx_session(
         async with new_non_ctx_session(connect) as session:
             await session.execute(...)
     """
-    session_maker = await connect.get_session_maker()
+    session_maker = await connect.session_maker()
     async with session_maker() as session:
         yield session
 

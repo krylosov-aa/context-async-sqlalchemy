@@ -66,10 +66,10 @@ class DBConnect:
 
     async def create_session(self) -> AsyncSession:
         """Creates a new session"""
-        maker = await self.get_session_maker()
+        maker = await self.session_maker()
         return maker()
 
-    async def get_session_maker(self) -> async_sessionmaker[AsyncSession]:
+    async def session_maker(self) -> async_sessionmaker[AsyncSession]:
         """Gets the session maker"""
         if self._before_create_session_handler:
             await self._before_create_session_handler(self)

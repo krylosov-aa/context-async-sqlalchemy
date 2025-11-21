@@ -5,7 +5,7 @@ from context_async_sqlalchemy import (
 )
 from sqlalchemy import insert
 
-from ..database import master
+from ..database import connection
 from ..models import ExampleTable
 
 
@@ -23,11 +23,11 @@ async def handler_with_db_session_and_manual_close() -> None:
     await _insert_3()
     # same connect -> same transaction
     await _insert_3()
-    # autocommit in middleware
+    # autocommit
 
 
 async def _insert_1() -> None:
-    session = await db_session(master)
+    session = await db_session(connection)
     stmt = insert(ExampleTable).values(
         text="example_with_db_session_and_manual_close"
     )
@@ -38,24 +38,24 @@ async def _insert_1() -> None:
 
 
 async def _insert_2() -> None:
-    session = await db_session(master)
+    session = await db_session(connection)
     stmt = insert(ExampleTable).values(
         text="example_with_db_session_and_manual_close"
     )
     await session.execute(stmt)
 
     # Here we closed the transaction
-    await commit_db_session(master)
+    await commit_db_session(connection)
 
     # And here we closed the session = returned the connection to the pool
     # This is useful if, for example, at the beginning of the handle a
     # database query is needed, and then there is some other long-term work
     # and you don't want to keep the connection opened.
-    await close_db_session(master)
+    await close_db_session(connection)
 
 
 async def _insert_3() -> None:
-    session = await db_session(master)
+    session = await db_session(connection)
     stmt = insert(ExampleTable).values(
         text="example_with_db_session_and_manual_close"
     )
