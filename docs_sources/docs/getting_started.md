@@ -1,5 +1,3 @@
-from starlette.applications import Starlette
-
 # Getting started
 
 ## Configure the connection to the database
