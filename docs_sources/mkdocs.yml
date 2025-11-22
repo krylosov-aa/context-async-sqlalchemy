@@ -6,7 +6,10 @@ theme:
   collapse_navigation: true
 nav:
   - context-async-sqlalchemy: index.md
+  - What problems it solves: problem.md
   - Getting started: getting_started.md
+  - Usage examples: examples.md
+  - Concurrent sql queries: concurrent_queries.md
   - Master/Replica or several databases at the same time: master_replica.md
   - Testing: testing.md
   - How middleware works: how_middleware_works.md
