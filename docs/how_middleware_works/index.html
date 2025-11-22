@@ -44,19 +44,19 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../problem">What problems it solves</a>
+                <li class="toctree-l1"><a class="reference internal" href="../problem">The Problem It Solves</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting started</a>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting Started</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent sql queries</a>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent SQL Queries</a>
                 </li>
               </ul>
               <ul>
@@ -95,11 +95,11 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="how-middleware-works">How middleware works</h1>
-<p>The biggest part of the work and magic happens in middleware.
-The library strives to provide ready-made solutions so that you don't have to
-worry. But they are not always there.
-Therefore, we will tell you how starlette middleware works,
-using the example of which you can write your own.</p>
+<p>Most of the work - and the “magic” - happens inside the middleware.
+The library aims to provide ready-made solutions so that you don’t have to
+worry about these details - but they’re not always available.</p>
+<p>So, let’s take a look at how Starlette middleware works.
+You can use this example as a reference to implement your own.</p>
 <pre><code class="language-python">from starlette.middleware.base import (  # type: ignore[attr-defined]
     Request,
     Response,

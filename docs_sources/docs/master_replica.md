@@ -1,23 +1,26 @@
 # Master/Replica or several databases at the same time
 
+This is why `db_session` and other functions accept a `DBConnect` instance as
+input.
+This approach allows you to work with multiple hosts simultaneously -
+for example, with both a master and a replica.
 
-This is why `db_session` and other functions accept `DBConnect` as input.
-This way, you can work with multiple hosts simultaneously, for example,
-with the master and the replica.
+`DBConnect` can also accept factory functions instead of ready-made objects,
+making it easy to switch hosts when needed.
+
+For example, `libpq` can detect the master and replica when creating an engine,
+but it only does this once - at creation time.
+The before_create_session_handler hook allows you to change the host at
+runtime if the master or replica changes.
+You’ll need third-party functionality to determine which host is the master
+or the replica.
 
 
-`DBConnect` also accepts factories instead of ready-made objects, so that you
-can easily change the host at the right time.
+[Hopefully, I’ll be able to provide a ready-made solution for this soon.](https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2).
 
-For example, libpq can detect the master and replica to create an engine.
-However, it only does this once during creation. `before_create_session_handler`
-helps change the host in the runtime if the master or replica changes.
-You need a third-party functionality that helps determine the master or
-replica.
-[I hope I can give you a ready solution soon too](https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2).
-
-The engine will not be created immediately when `DBConnect` is initialized.
-This will only happen on the first request. The library is lazy in many places.
+The engine is not created immediately when `DBConnect` is initialized -
+it is created only on the first request.
+The library uses lazy initialization in many places.
 
 ```python
 from context_async_sqlalchemy import DBConnect

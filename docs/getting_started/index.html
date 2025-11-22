@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Getting started - context-async-sqlalchemy</title>
+    <title>Getting Started - context-async-sqlalchemy</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Getting started";
+        var mkdocs_page_name = "Getting Started";
         var mkdocs_page_input_path = "getting_started.md";
         var mkdocs_page_url = null;
       </script>
@@ -44,11 +44,11 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../problem">What problems it solves</a>
+                <li class="toctree-l1"><a class="reference internal" href="../problem">The Problem It Solves</a>
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">Getting started</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Getting Started</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#configure-the-connection-to-the-database">Configure the connection to the database</a>
     </li>
@@ -64,11 +64,11 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent sql queries</a>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent SQL Queries</a>
                 </li>
               </ul>
               <ul>
@@ -97,7 +97,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Getting started</li>
+      <li class="breadcrumb-item active">Getting Started</li>
   </ul>
   <hr/>
 </div>
@@ -106,7 +106,7 @@
               
                 <h1 id="getting-started">Getting started</h1>
 <h2 id="configure-the-connection-to-the-database">Configure the connection to the database</h2>
-<p>for example for PostgreSQL database.py:</p>
+<p>For example, for PostgreSQL - database.py:</p>
 <pre><code class="language-python">from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncEngine,
@@ -153,7 +153,7 @@ connection = DBConnect(
 )
 </code></pre>
 <h2 id="manage-database-connection-lifecycle">Manage Database connection lifecycle</h2>
-<p>Close the resources at the end of your application's life</p>
+<p>Close resources at the end of your application's lifecycle.</p>
 <p>Example for FastAPI:</p>
 <pre><code class="language-python">from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
@@ -169,8 +169,9 @@ async def lifespan(app: FastAPI) -&gt; AsyncGenerator[None, Any]:
     await connection.close()  # Close the engine if it was open
 </code></pre>
 <h2 id="setup-middleware">Setup middleware</h2>
-<p>Middleware takes on the most important and complex work of managing context and sessions.</p>
-<p>You can use ready-made middlewares:</p>
+<p>Middleware handles the most important and complex part -
+managing context and sessions.</p>
+<p>You can use the ready-made middleware components:</p>
 <h3 id="fastapi">FastAPI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy.fastapi_utils import (
     add_fastapi_http_db_session_middleware,
@@ -188,8 +189,9 @@ app = Starlette(...)
 add_starlette_http_db_session_middleware(app)
 </code></pre>
 <h3 id="write-own">Write own</h3>
-<p>If there is no ready-made solution for you, don't worry! You can see
-<a href="../how_middleware_works">how it works</a> and write your own.</p>
+<p>If there’s no ready-made solution that fits your needs - don’t worry!
+You can check out <a href="../how_middleware_works">how it works</a> and implement your
+own.</p>
 <h2 id="use-it">Use it</h2>
 <pre><code class="language-python">from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
@@ -216,19 +218,21 @@ async def some_func() -&gt; None:
     # The commit and closing of the session will occur automatically
 </code></pre>
 <h2 id="examples">Examples</h2>
-<p>The repository includes an example integration with FastAPI,
-which describes numerous workflows.
+<p>The repository includes an example integration with FastAPI, demonstrating
+various workflows:
 <a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes">FastAPI example</a></p>
-<p>It also includes two types of test setups you can use in your projects.</p>
-<p>All library tests are in the examples, as we want to test not in the abstract
-but in the context of a real asynchronous web application.</p>
-<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests">FastAPI tests example</a></p>
+<p>It also contains two types of test setups that you can use in your own
+projects.</p>
+<p>All library tests are included within the examples - because we aim to
+test the functionality not in isolation, but in the context of a real
+asynchronous web application.
+<a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests">FastAPI tests example</a></p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../problem" class="btn btn-neutral float-left" title="What problems it solves"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../examples" class="btn btn-neutral float-right" title="Usage examples">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../problem" class="btn btn-neutral float-left" title="The Problem It Solves"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../examples" class="btn btn-neutral float-right" title="Usage Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>

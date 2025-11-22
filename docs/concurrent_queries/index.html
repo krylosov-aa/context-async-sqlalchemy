@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Concurrent sql queries - context-async-sqlalchemy</title>
+    <title>Concurrent SQL Queries - context-async-sqlalchemy</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Concurrent sql queries";
+        var mkdocs_page_name = "Concurrent SQL Queries";
         var mkdocs_page_input_path = "concurrent_queries.md";
         var mkdocs_page_url = null;
       </script>
@@ -44,19 +44,19 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../problem">What problems it solves</a>
+                <li class="toctree-l1"><a class="reference internal" href="../problem">The Problem It Solves</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting started</a>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting Started</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">Concurrent sql queries</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Concurrent SQL Queries</a>
     <ul class="current">
     </ul>
                 </li>
@@ -87,7 +87,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Concurrent sql queries</li>
+      <li class="breadcrumb-item active">Concurrent SQL Queries</li>
   </ul>
   <hr/>
 </div>
@@ -95,14 +95,14 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="concurrent-sql-queries">Concurrent sql queries</h1>
-<p>Concurrent query execution deserves special attention. In sqlalchemy,
-you cannot concurrently run multiple queries within the same session.
-You need to create a new session. The library provides 2 ways to execute
-queries concurrently very easily:</p>
+<p>Concurrent query execution deserves special attention.
+In SQLAlchemy, you can’t run multiple queries concurrently within the same
+session - you need to create a new one.</p>
+<p>The library provides two simple ways to execute queries concurrently:</p>
 <ul>
-<li>calling a function with a new context - <code>run_in_new_ctx</code></li>
-<li>get a new session that doesn't fit into the context at all -
-<code>new_non_ctx_atomic_session</code> or <code>new_non_ctx_session</code> </li>
+<li>Run a function in a new context - <code>run_in_new_ctx</code></li>
+<li>Create a new session that is completely independent of the current context -
+<code>new_non_ctx_atomic_session</code> or <code>new_non_ctx_session</code></li>
 </ul>
 <pre><code class="language-python">import asyncio
 
@@ -180,7 +180,7 @@ async def _insert_non_ctx_manual() -&gt; None:
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../examples" class="btn btn-neutral float-left" title="Usage examples"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../examples" class="btn btn-neutral float-left" title="Usage Examples"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../master_replica" class="btn btn-neutral float-right" title="Master/Replica or several databases at the same time">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 

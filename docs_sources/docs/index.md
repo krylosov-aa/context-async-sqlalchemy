@@ -4,26 +4,28 @@
 
 [SOURCE CODE](https://github.com/krylosov-aa/context-async-sqlalchemy)
 
-Provides a super convenient way to work with sqlalchemy in asynchronous
-applications. It takes care of the issues of managing the lifecycle of engine,
-session, and transactions without being a wrapper.
+Provides a super convenient way to work with SQLAlchemy in asynchronous
+applications.
+It handles the lifecycle management of the engine, sessions, and
+transactions.
 
-The main task is to get quick and easy access to the session and not worry
-about when to open and when to close it.
+The main goal is to provide quick and easy access to a session,
+without having to worry about opening or closing it when it’s not necessary.
 
-The key features are:
+Key features:
 
-- Super easy to use
-- Automatically manages the lifecycle of engine, session, and transaction
-(autocommit/autorollback)
-- It doesn't interfere with manually opening and closing sessions and
-transactions when needed.
-- Does not depend on the web framework
-- It is not a wrapper over sqlalchemy
-- It is convenient to test
-- Host switching in runtime
-- It can manage multiple databases and multiple sessions to a single database
-- Provides tools for concurrent sql queries
+- Extremely easy to use
+- Automatically manages the lifecycle of the engine, sessions, and
+transactions (autocommit / autorollback)
+- Does not interfere with manually opening or closing sessions and
+transactions when needed
+- Framework-agnostic - works with any web framework
+- Not a wrapper around SQLAlchemy
+- Convenient for testing
+- Runtime host switching
+- Supports multiple databases and multiple sessions per database
+- Provides tools for running concurrent SQL queries
+- Fully lazy initialization
 
 
 ## What does usage look like?

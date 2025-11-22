@@ -2,7 +2,7 @@
 
 ## Configure the connection to the database
 
-for example for PostgreSQL database.py:
+For example, for PostgreSQL - database.py:
 
 ```python
 from sqlalchemy.ext.asyncio import (
@@ -55,7 +55,7 @@ connection = DBConnect(
 ## Manage Database connection lifecycle
 
  
-Close the resources at the end of your application's life
+Close resources at the end of your application's lifecycle.
 
 Example for FastAPI:
 
@@ -76,10 +76,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
 
 ## Setup middleware
 
-Middleware takes on the most important and complex work of managing context and sessions.
+Middleware handles the most important and complex part -
+managing context and sessions.
 
-
-You can use ready-made middlewares:
+You can use the ready-made middleware components:
 
 ### FastAPI
 
@@ -105,8 +105,9 @@ add_starlette_http_db_session_middleware(app)
 
 ### Write own
 
-If there is no ready-made solution for you, don't worry! You can see
-[how it works](how_middleware_works.md) and write your own.
+If there’s no ready-made solution that fits your needs - don’t worry!
+You can check out [how it works](how_middleware_works.md) and implement your
+own.
 
 
 ## Use it
@@ -140,13 +141,14 @@ async def some_func() -> None:
 
 ## Examples
 
-The repository includes an example integration with FastAPI,
-which describes numerous workflows.
+The repository includes an example integration with FastAPI, demonstrating
+various workflows:
 [FastAPI example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes)
 
-It also includes two types of test setups you can use in your projects.
+It also contains two types of test setups that you can use in your own
+projects.
 
-All library tests are in the examples, as we want to test not in the abstract
-but in the context of a real asynchronous web application.
-
+All library tests are included within the examples - because we aim to
+test the functionality not in isolation, but in the context of a real
+asynchronous web application.
 [FastAPI tests example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests)

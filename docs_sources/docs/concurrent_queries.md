@@ -1,14 +1,15 @@
 # Concurrent sql queries
 
 
-Concurrent query execution deserves special attention. In sqlalchemy,
-you cannot concurrently run multiple queries within the same session.
-You need to create a new session. The library provides 2 ways to execute
-queries concurrently very easily:
+Concurrent query execution deserves special attention.
+In SQLAlchemy, you can’t run multiple queries concurrently within the same
+session - you need to create a new one.
 
-- calling a function with a new context - `run_in_new_ctx`
-- get a new session that doesn't fit into the context at all -
-`new_non_ctx_atomic_session` or `new_non_ctx_session` 
+The library provides two simple ways to execute queries concurrently:
+
+- Run a function in a new context - `run_in_new_ctx`
+- Create a new session that is completely independent of the current context -
+`new_non_ctx_atomic_session` or `new_non_ctx_session`
 
 
 ```python

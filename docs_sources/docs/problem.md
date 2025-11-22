@@ -1,24 +1,24 @@
-# The problem that the library solves
+# The Problem It Solves
 
-Sqlalchemy has an engine that is responsible for the connection pool.
-The engine must be alive all the time the application is running in order to
-quickly issue ready connections to the application when it needs it.
+SQLAlchemy uses an engine that manages the connection pool.
+The engine must remain active for as long as the application is
+running, so it can quickly provide ready-to-use connections whenever the
+application needs them.
 
-We use sessions in the application.
-The session receives one connection from the pool. The session should live a
-short time, at most for the processing time of one request, and often even
+In the application, we work with sessions.
+A session obtains a single connection from the pool and should have a short
+lifespan - usually lasting only for the duration of a single request, or even
 less.
 
 ![Engine_and_session.png](img/engine_session_schema.png)
 
-Let's see what existing solutions are available to manage engine and session:
+Let's see what existing solutions are available to manage sessions:
 
 ### Manual solution
 
-This is how the code is duplicated and that two connections and two
-transactions
-are used. And often in this case, one connection and one transaction
-were needed:
+This is how the code ends up being duplicated,
+and two connections and two transactions are used - even though
+in many cases only one connection and one transaction are actually needed.
 
 ```python
 @app.post("/users/")
@@ -39,8 +39,9 @@ async def insert_user_profile(name):
             await session.execute(stmt)
 ```
 
-You can move the duplicate code to a higher level, and then you get one
-connection and a transaction:
+You can move the duplicated code to a higher level, which will result in using
+a single connection and a single transaction.
+
 
 ```python
 @app.post("/users/")
@@ -59,8 +60,9 @@ async def insert_user_profile(name, session):
     await session.execute(stmt)
 ```
 
-But if you look at it globally, the code duplication doesn't go away.
-You need to do this in every handler:
+But if you look at it more broadly, the code duplication doesn’t actually go
+away - you still have to do this in every handler.
+
 
 ```python
 @app.post("/dogs/")
@@ -77,13 +79,13 @@ async def create_cat(name):
             ...
 ```
 
-You also have to set up everything yourself.
-No ready-made integration solutions are used. On the one hand, freedom,
-on the other hand, a lot of code.
+You also have to set everything up yourself.
+No ready-made integration solutions are used - which means freedom on one
+hand, but a lot of code on the other.
 
 ### Dependency
 
-You can use dependency. For example, in fatsapi it looks like this:
+You can use a dependency. For example, in FastAPI, it looks like this:
 
 ```python
 async def get_atomic_session():
@@ -102,21 +104,23 @@ async def create_cat(name, session=Depends(get_atomic_session)):
     ...
 ```
 
-There are 2 problems here:
+There are two problems here:
 
-- You cannot close the session and transaction prematurely, because the
-  dependency is responsible for this
-- The session will have to be rolled from the very top of the stack down to
-  the point where it is really needed
+1. You can’t close the session or transaction prematurely, because the
+dependency is responsible for that.
+2. The session has to be passed all the way down the stack to the place where
+it’s actually needed.
 
-By the way, there is no ready-made solution for integration into the framework
-here. Write the dependency itself yourself
+
+By the way, there’s no ready-made solution for integrating with the framework
+- you have to implement the dependency yourself.
 
 ### Wrappers over sqlalachemy
 
-There are various wrappers that often have more convenient integration
+There are various wrappers that often provide more convenient integration.
 
-Litestar, for example, has the advantages and disadvantages of dependency:
+Litestar, for example, has the same advantages and disadvantages as using
+dependencies:
 
 ```python
 config = SQLAlchemyAsyncConfig(
@@ -135,7 +139,7 @@ async def create_user(data: User, repo: UserRepository):
     await repo.add(data)  # <- insert into User
 ```
 
-here is an example of ormar:
+Here’s an example using Ormar:
 
 ```python
 class BaseMeta(ormar.ModelMeta):
@@ -151,18 +155,22 @@ async def create_user(name):
     await User.objects.create(name=name)
 ```
 
-The main problem with wrappers is that it's new knowledge that the developer
-needs to know. This is a new syntax. If a developer knows sqlalchemy
-they don't necessarily know the wrapper.
+The main problem with wrappers is that they require developers to learn
+something new.
+They introduce their own syntax - so even if a developer is familiar with
+SQLAlchemy, it doesn’t mean they’ll understand the wrapper.
 
-Wrappers are also often conveniently designed with simple CRUD scripts,
-but complex SQL queries are very difficult to write.
+Wrappers are also often designed for convenience when working with simple
+CRUD operations, but writing complex SQL queries with them can be very
+challenging.
+
 
 ### Solution
 
-And the library solves all this:
+And this library solves all of these issues:
 
-- Very convenient integration with web frameworks
-- Automatic engine, session and transaction lifecycle management
-- You can close the session manually without waiting for automation
-- Getting a session out of context only where it is needed
+- Easy integration with web frameworks
+- Automatic management of engine, session, and transaction lifecycles
+- Ability to manually close a session at any time, without waiting for the
+end of process
+- Access to a session from the context only where it’s actually needed

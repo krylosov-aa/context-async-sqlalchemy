@@ -1,10 +1,12 @@
 # How middleware works
 
-The biggest part of the work and magic happens in middleware.
-The library strives to provide ready-made solutions so that you don't have to
-worry. But they are not always there.
-Therefore, we will tell you how starlette middleware works,
-using the example of which you can write your own.
+Most of the work - and the “magic” - happens inside the middleware.
+The library aims to provide ready-made solutions so that you don’t have to
+worry about these details - but they’re not always available.
+
+
+So, let’s take a look at how Starlette middleware works.
+You can use this example as a reference to implement your own.
 
 
 ```python

@@ -1,52 +1,57 @@
 # Testing
 
 
-For testing with a real database, there is one important problem that needs to
-be solved - data isolation between tests.
+When testing with a real database, one important problem needs to be
+solved - ensuring data isolation between tests.
 
 There are basically two approaches:
 
-1. The test has its own session with which it can prepare data for the
-test and verify the result of the test execution at the end.
-The application has its own session. Data isolation is achieved by clearing
-data from all tables at the end of each test
-(as well as once before running all tests)
-2. The test and the application share the same session and the same
-transaction. Data isolation is achieved by rolling back the transaction
-at the end of the test.
 
-Personally, I really like the first option. Because this is an honest testing of the application.
-We check how it works correctly with sessions and transactions on our own.
-It is also very convenient to check the status of the database when the
-test is suspended.
+1. Separate sessions.
 
-And sometimes there are such complex session management scenarios
-(for example, concurrent query execution) in which other types of
-testing are either impossible or very difficult.
+The test has its own session that it uses to prepare data and verify
+results after execution.
+The application also has its own session.
+Data isolation is achieved by clearing all tables at the end of each test
+(and once before running all tests).
 
-The only disadvantage of such tests is the speed of their execution.
-Due to the fact that we clear all the tables after each test, we spend
-a lot of time on this.
+2. Shared session and transaction.
+The test and the application share the same session and transaction.
+Data isolation is achieved by rolling back the transaction at
+the end of the test.
 
-This is where the second type of testing comes on the scene,
-which has the only advantage in the speed of execution due to the fact
-that it is very fast to roll back the transaction.
+Personally, I prefer the first option, because it is a more "honest" way
+to test the application.
+We can verify how it handles sessions and transactions on its own.
+It’s also convenient to inspect the database state when a test is paused.
 
+Sometimes, there are complex session management scenarios (for example,
+concurrent query execution) where other types of testing are either
+impossible or very difficult.
 
-I use both approaches simultaneously in my projects.
-Most of the tests where the usual and simple logic is tested,
-I use a common transaction for the test and for the application. 
-And where there is complex logic or it is simply not possible to
-test like this, I use tests with different transactions.
-This allows you to achieve good speed and good test convenience.
+The main disadvantage of this approach is the slower execution speed.
+Since we clear all tables after each test, this process takes additional time.
 
-The library provides several utils that can be used in tests,
-for example in fixtures. It helps write tests that share a common transaction
-between the test and the application, so data isolation between tests is
-achieved through fast transaction rollback.
+This is where the second approach comes in - its main advantage is speed,
+as rolling back a transaction is very fast.
+
+In my projects, I use both approaches at the same time:
+
+- For most tests with simple or common logic, I use a shared transaction
+for the test and the application
+- For more complex cases, or ones that cannot be tested this way,
+I use separate transactions.
 
 
-You can see the capabilities in the examples:
+This combination allows for both good performance and convenient testing.
+
+The library provides several utilities that can be used in tests - for
+example, in fixtures.
+They help create tests that share a common transaction between the test
+and the application, so data isolation between tests is achieved through
+fast transaction rollback.
+
+You can see these capabilities in the examples:
 
 [Here are tests with a common transaction between the
 application and the tests.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/transactional/__init__.py)

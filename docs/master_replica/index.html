@@ -44,19 +44,19 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../problem">What problems it solves</a>
+                <li class="toctree-l1"><a class="reference internal" href="../problem">The Problem It Solves</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting started</a>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting Started</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent sql queries</a>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent SQL Queries</a>
                 </li>
               </ul>
               <ul class="current">
@@ -95,19 +95,22 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="masterreplica-or-several-databases-at-the-same-time">Master/Replica or several databases at the same time</h1>
-<p>This is why <code>db_session</code> and other functions accept <code>DBConnect</code> as input.
-This way, you can work with multiple hosts simultaneously, for example,
-with the master and the replica.</p>
-<p><code>DBConnect</code> also accepts factories instead of ready-made objects, so that you
-can easily change the host at the right time.</p>
-<p>For example, libpq can detect the master and replica to create an engine.
-However, it only does this once during creation. <code>before_create_session_handler</code>
-helps change the host in the runtime if the master or replica changes.
-You need a third-party functionality that helps determine the master or
-replica.
-<a href="https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2">I hope I can give you a ready solution soon too</a>.</p>
-<p>The engine will not be created immediately when <code>DBConnect</code> is initialized.
-This will only happen on the first request. The library is lazy in many places.</p>
+<p>This is why <code>db_session</code> and other functions accept a <code>DBConnect</code> instance as
+input.
+This approach allows you to work with multiple hosts simultaneously -
+for example, with both a master and a replica.</p>
+<p><code>DBConnect</code> can also accept factory functions instead of ready-made objects,
+making it easy to switch hosts when needed.</p>
+<p>For example, <code>libpq</code> can detect the master and replica when creating an engine,
+but it only does this once - at creation time.
+The before_create_session_handler hook allows you to change the host at
+runtime if the master or replica changes.
+You’ll need third-party functionality to determine which host is the master
+or the replica.</p>
+<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2">Hopefully, I’ll be able to provide a ready-made solution for this soon.</a>.</p>
+<p>The engine is not created immediately when <code>DBConnect</code> is initialized -
+it is created only on the first request.
+The library uses lazy initialization in many places.</p>
 <pre><code class="language-python">from context_async_sqlalchemy import DBConnect
 
 from master_replica_helper import get_master, get_replica
@@ -142,7 +145,7 @@ replica = DBConnect(
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../concurrent_queries" class="btn btn-neutral float-left" title="Concurrent sql queries"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../concurrent_queries" class="btn btn-neutral float-left" title="Concurrent SQL Queries"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../testing" class="btn btn-neutral float-right" title="Testing">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 

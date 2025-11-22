@@ -50,19 +50,19 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="problem">What problems it solves</a>
+                <li class="toctree-l1"><a class="reference internal" href="problem">The Problem It Solves</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="getting_started">Getting started</a>
+                <li class="toctree-l1"><a class="reference internal" href="getting_started">Getting Started</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="examples">Usage examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="examples">Usage Examples</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="concurrent_queries">Concurrent sql queries</a>
+                <li class="toctree-l1"><a class="reference internal" href="concurrent_queries">Concurrent SQL Queries</a>
                 </li>
               </ul>
               <ul>
@@ -101,24 +101,26 @@
                 <h1 id="context-async-sqlalchemy">context-async-sqlalchemy</h1>
 <p><a href="https://pypi.org/project/context-async-sqlalchemy/"><img alt="PyPI" src="https://img.shields.io/pypi/v/context-async-sqlalchemy.svg" /></a></p>
 <p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy">SOURCE CODE</a></p>
-<p>Provides a super convenient way to work with sqlalchemy in asynchronous
-applications. It takes care of the issues of managing the lifecycle of engine,
-session, and transactions without being a wrapper.</p>
-<p>The main task is to get quick and easy access to the session and not worry
-about when to open and when to close it.</p>
-<p>The key features are:</p>
+<p>Provides a super convenient way to work with SQLAlchemy in asynchronous
+applications.
+It handles the lifecycle management of the engine, sessions, and
+transactions.</p>
+<p>The main goal is to provide quick and easy access to a session,
+without having to worry about opening or closing it when it’s not necessary.</p>
+<p>Key features:</p>
 <ul>
-<li>Super easy to use</li>
-<li>Automatically manages the lifecycle of engine, session, and transaction
-(autocommit/autorollback)</li>
-<li>It doesn't interfere with manually opening and closing sessions and
-transactions when needed.</li>
-<li>Does not depend on the web framework</li>
-<li>It is not a wrapper over sqlalchemy</li>
-<li>It is convenient to test</li>
-<li>Host switching in runtime</li>
-<li>It can manage multiple databases and multiple sessions to a single database</li>
-<li>Provides tools for concurrent sql queries</li>
+<li>Extremely easy to use</li>
+<li>Automatically manages the lifecycle of the engine, sessions, and
+transactions (autocommit / autorollback)</li>
+<li>Does not interfere with manually opening or closing sessions and
+transactions when needed</li>
+<li>Framework-agnostic - works with any web framework</li>
+<li>Not a wrapper around SQLAlchemy</li>
+<li>Convenient for testing</li>
+<li>Runtime host switching</li>
+<li>Supports multiple databases and multiple sessions per database</li>
+<li>Provides tools for running concurrent SQL queries</li>
+<li>Fully lazy initialization</li>
 </ul>
 <h2 id="what-does-usage-look-like">What does usage look like?</h2>
 <pre><code class="language-python">from context_async_sqlalchemy import db_session
@@ -163,7 +165,7 @@ time, without waiting for the end of the request, without any problems.</p>
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="problem" class="btn btn-neutral float-right" title="What problems it solves">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="problem" class="btn btn-neutral float-right" title="The Problem It Solves">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -211,5 +213,5 @@ time, without waiting for the end of the request, without any problems.</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-11-22 20:45:50.885762+00:00
+Build Date UTC : 2025-11-22 21:19:17.238880+00:00
 -->
