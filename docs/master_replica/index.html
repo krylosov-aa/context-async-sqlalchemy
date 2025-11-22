@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Master/Replica or several databases at the same time - context-async-sqlalchemy</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Master/Replica or several databases at the same time";
+        var mkdocs_page_input_path = "master_replica.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> context-async-sqlalchemy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">context-async-sqlalchemy</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../problem">What problems it solves</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent sql queries</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Master/Replica or several databases at the same time</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../testing">Testing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works">How middleware works</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">context-async-sqlalchemy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Master/Replica or several databases at the same time</li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="masterreplica-or-several-databases-at-the-same-time">Master/Replica or several databases at the same time</h1>
+<p>This is why <code>db_session</code> and other functions accept <code>DBConnect</code> as input.
+This way, you can work with multiple hosts simultaneously, for example,
+with the master and the replica.</p>
+<p><code>DBConnect</code> also accepts factories instead of ready-made objects, so that you
+can easily change the host at the right time.</p>
+<p>For example, libpq can detect the master and replica to create an engine.
+However, it only does this once during creation. <code>before_create_session_handler</code>
+helps change the host in the runtime if the master or replica changes.
+You need a third-party functionality that helps determine the master or
+replica.
+<a href="https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2">I hope I can give you a ready solution soon too</a>.</p>
+<p>The engine will not be created immediately when <code>DBConnect</code> is initialized.
+This will only happen on the first request. The library is lazy in many places.</p>
+<pre><code class="language-python">from context_async_sqlalchemy import DBConnect
+
+from master_replica_helper import get_master, get_replica
+
+
+async def renew_master_connect(connect: DBConnect) -&gt; None:
+    &quot;&quot;&quot;Updates the host if the master has changed&quot;&quot;&quot;
+    master_host = await get_master()
+    if master_host != connect.host:
+        await connect.change_host(master_host)
+
+
+master = DBConnect(
+    ...,
+    before_create_session_handler=renew_master_connect,
+)
+
+
+async def renew_replica_connect(connect: DBConnect) -&gt; None:
+    &quot;&quot;&quot;Updates the host if the replica has changed&quot;&quot;&quot;
+    replica_host = await get_replica()
+    if replica_host != connect.host:
+        await connect.change_host(replica_host)
+
+
+replica = DBConnect(
+    ...,
+    before_create_session_handler=renew_replica_connect,
+)
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../concurrent_queries" class="btn btn-neutral float-left" title="Concurrent sql queries"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../testing" class="btn btn-neutral float-right" title="Testing">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/krylosov-aa/context-async-sqlalchemy" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../concurrent_queries" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../testing" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

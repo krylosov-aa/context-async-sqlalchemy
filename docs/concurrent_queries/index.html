@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Concurrent sql queries - context-async-sqlalchemy</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Concurrent sql queries";
+        var mkdocs_page_input_path = "concurrent_queries.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> context-async-sqlalchemy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">context-async-sqlalchemy</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../problem">What problems it solves</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Concurrent sql queries</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../master_replica">Master/Replica or several databases at the same time</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../testing">Testing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works">How middleware works</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">context-async-sqlalchemy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Concurrent sql queries</li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="concurrent-sql-queries">Concurrent sql queries</h1>
+<p>Concurrent query execution deserves special attention. In sqlalchemy,
+you cannot concurrently run multiple queries within the same session.
+You need to create a new session. The library provides 2 ways to execute
+queries concurrently very easily:</p>
+<ul>
+<li>calling a function with a new context - <code>run_in_new_ctx</code></li>
+<li>get a new session that doesn't fit into the context at all -
+<code>new_non_ctx_atomic_session</code> or <code>new_non_ctx_session</code> </li>
+</ul>
+<pre><code class="language-python">import asyncio
+
+from context_async_sqlalchemy import (
+    close_db_session,
+    commit_db_session,
+    db_session,
+    new_non_ctx_atomic_session,
+    new_non_ctx_session,
+    run_in_new_ctx,
+)
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_multiple_sessions() -&gt; None:
+    &quot;&quot;&quot;
+    In some situations, you need to have multiple sessions running
+        simultaneously. For example, to run several queries concurrently.
+
+    You can also use these same techniques to create new sessions whenever you
+        need them. Not necessarily just because of the concurrent processing.
+    &quot;&quot;&quot;
+    await asyncio.gather(
+        _insert(),  # context session
+        run_in_new_ctx(_insert),  # new context and session with autocommit
+        run_in_new_ctx(  # new context and session with manual commit
+            _insert_manual, &quot;example_multiple_sessions&quot;,
+        ),
+        _insert_non_ctx(),  # new non context session
+        _insert_non_ctx_manual(),  # new non context session
+    )
+
+
+async def _insert() -&gt; None:
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
+    await session.execute(stmt)
+
+
+async def _insert_manual(text: str) -&gt; None:
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(text=text)
+    await session.execute(stmt)
+
+    # You can manually commit the transaction if you want, but it is not
+    #   necessary
+    await commit_db_session(connection)
+
+    # You can manually close the session if you want, but it is not necessary
+    await close_db_session(connection)
+
+
+async def _insert_non_ctx() -&gt; None:
+    &quot;&quot;&quot;
+    You don't have to use the context to work with sessions at all
+    &quot;&quot;&quot;
+    async with new_non_ctx_atomic_session(connection) as session:
+        stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
+        await session.execute(stmt)
+
+
+async def _insert_non_ctx_manual() -&gt; None:
+    &quot;&quot;&quot;
+    You don't have to use the context to work with sessions at all
+    &quot;&quot;&quot;
+    async with new_non_ctx_session(connection) as session:
+        stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
+        await session.execute(stmt)
+        await session.commit()
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../examples" class="btn btn-neutral float-left" title="Usage examples"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../master_replica" class="btn btn-neutral float-right" title="Master/Replica or several databases at the same time">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/krylosov-aa/context-async-sqlalchemy" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../examples" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../master_replica" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>What problems it solves - context-async-sqlalchemy</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "What problems it solves";
+        var mkdocs_page_input_path = "problem.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> context-async-sqlalchemy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">context-async-sqlalchemy</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">What problems it solves</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#manual-solution">Manual solution</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dependency">Dependency</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#wrappers-over-sqlalachemy">Wrappers over sqlalachemy</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#solution">Solution</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage examples</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent sql queries</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../master_replica">Master/Replica or several databases at the same time</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../testing">Testing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works">How middleware works</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">context-async-sqlalchemy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">What problems it solves</li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="the-problem-that-the-library-solves">The problem that the library solves</h1>
+<p>Sqlalchemy has an engine that is responsible for the connection pool.
+The engine must be alive all the time the application is running in order to
+quickly issue ready connections to the application when it needs it.</p>
+<p>We use sessions in the application.
+The session receives one connection from the pool. The session should live a
+short time, at most for the processing time of one request, and often even
+less.</p>
+<p><img alt="Engine_and_session.png" src="../img/engine_session_schema.png" /></p>
+<p>Let's see what existing solutions are available to manage engine and session:</p>
+<h3 id="manual-solution">Manual solution</h3>
+<p>This is how the code is duplicated and that two connections and two
+transactions
+are used. And often in this case, one connection and one transaction
+were needed:</p>
+<pre><code class="language-python">@app.post(&quot;/users/&quot;)
+async def create_user(name):
+    await insert_user(name)
+    await insert_user_profile(name)
+
+
+async def insert_user(name):
+    async with get_async_session() as session:
+        async with session.begin():
+            await session.execute(stmt)
+
+
+async def insert_user_profile(name):
+    async with get_async_session() as session:
+        async with session.begin():
+            await session.execute(stmt)
+</code></pre>
+<p>You can move the duplicate code to a higher level, and then you get one
+connection and a transaction:</p>
+<pre><code class="language-python">@app.post(&quot;/users/&quot;)
+async def create_user(name:):
+    async with get_async_session() as session:
+        async with session.begin():
+            await insert_user(name, session)
+            await insert_user_profile(name, session)
+
+
+async def insert_user(name, session):
+    await session.execute(stmt)
+
+
+async def insert_user_profile(name, session):
+    await session.execute(stmt)
+</code></pre>
+<p>But if you look at it globally, the code duplication doesn't go away.
+You need to do this in every handler:</p>
+<pre><code class="language-python">@app.post(&quot;/dogs/&quot;)
+async def create_dog(name):
+    async with get_async_session() as session:
+        async with session.begin():
+            ...
+
+
+@app.post(&quot;/cats&quot;)
+async def create_cat(name):
+    async with get_async_session() as session:
+        async with session.begin():
+            ...
+</code></pre>
+<p>You also have to set up everything yourself.
+No ready-made integration solutions are used. On the one hand, freedom,
+on the other hand, a lot of code.</p>
+<h3 id="dependency">Dependency</h3>
+<p>You can use dependency. For example, in fatsapi it looks like this:</p>
+<pre><code class="language-python">async def get_atomic_session():
+    async with session_maker() as session:
+        async with session.begin():
+            yield session
+
+
+@app.post(&quot;/dogs/&quot;)
+async def create_dog(name, session=Depends(get_atomic_session)):
+    ...
+
+
+@app.post(&quot;/cats/&quot;)
+async def create_cat(name, session=Depends(get_atomic_session)):
+    ...
+</code></pre>
+<p>There are 2 problems here:</p>
+<ul>
+<li>You cannot close the session and transaction prematurely, because the
+  dependency is responsible for this</li>
+<li>The session will have to be rolled from the very top of the stack down to
+  the point where it is really needed</li>
+</ul>
+<p>By the way, there is no ready-made solution for integration into the framework
+here. Write the dependency itself yourself</p>
+<h3 id="wrappers-over-sqlalachemy">Wrappers over sqlalachemy</h3>
+<p>There are various wrappers that often have more convenient integration</p>
+<p>Litestar, for example, has the advantages and disadvantages of dependency:</p>
+<pre><code class="language-python">config = SQLAlchemyAsyncConfig(
+    connection_string=URL
+)
+
+sqlalchemy_plugin = SQLAlchemyInitPlugin(config)
+
+
+class UserRepository(SQLAlchemyAsyncRepository[User]):
+    model_type = User
+
+
+@post(&quot;/users&quot;)
+async def create_user(data: User, repo: UserRepository):
+    await repo.add(data)  # &lt;- insert into User
+</code></pre>
+<p>here is an example of ormar:</p>
+<pre><code class="language-python">class BaseMeta(ormar.ModelMeta):
+    ...
+
+
+class User(ormar.Model):
+    ...
+
+
+@app.post(&quot;/users/&quot;)
+async def create_user(name):
+    await User.objects.create(name=name)
+</code></pre>
+<p>The main problem with wrappers is that it's new knowledge that the developer
+needs to know. This is a new syntax. If a developer knows sqlalchemy
+they don't necessarily know the wrapper.</p>
+<p>Wrappers are also often conveniently designed with simple CRUD scripts,
+but complex SQL queries are very difficult to write.</p>
+<h3 id="solution">Solution</h3>
+<p>And the library solves all this:</p>
+<ul>
+<li>Very convenient integration with web frameworks</li>
+<li>Automatic engine, session and transaction lifecycle management</li>
+<li>You can close the session manually without waiting for automation</li>
+<li>Getting a session out of context only where it is needed</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="context-async-sqlalchemy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../getting_started" class="btn btn-neutral float-right" title="Getting started">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/krylosov-aa/context-async-sqlalchemy" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../getting_started" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
