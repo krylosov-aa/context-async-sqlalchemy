@@ -26,7 +26,8 @@ async def handler_multiple_sessions() -> None:
         _insert(),  # context session
         run_in_new_ctx(_insert),  # new context and session with autocommit
         run_in_new_ctx(  # new context and session with manual commit
-            _insert_manual, "example_multiple_sessions",
+            _insert_manual,
+            "example_multiple_sessions",
         ),
         _insert_non_ctx(),  # new non context session
         _insert_non_ctx_manual(),  # new non context session

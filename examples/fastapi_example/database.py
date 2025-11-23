@@ -1,5 +1,5 @@
 """
-The module where the database connection parameters are defined
+The module that defines the database connection parameters
 """
 
 from sqlalchemy.ext.asyncio import (
@@ -14,7 +14,7 @@ from context_async_sqlalchemy import DBConnect
 
 def create_engine(host: str) -> AsyncEngine:
     """
-    database connection parameters.
+    database connection parameters
     """
 
     # In production code, you will probably take these parameters from env
