@@ -2,6 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/context-async-sqlalchemy.svg)](https://pypi.org/project/context-async-sqlalchemy/)
 
+No AI was used in the creation of this library.
+
 [DOCUMENTATION](https://krylosov-aa.github.io/context-async-sqlalchemy/)
 
 Provides a super convenient way to work with SQLAlchemy in asynchronous
