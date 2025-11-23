@@ -1,5 +1,6 @@
-# Testing
-
+# An example of integration tests.
+I recommend this approach because it’s independent of the application’s
+    architecture and allows you to test your application in a realistic way.
 
 When testing with a real database, one important problem needs to be
 solved - ensuring data isolation between tests.
@@ -54,49 +55,7 @@ fast transaction rollback.
 You can see these capabilities in the examples:
 
 [Here are tests with a common transaction between the
-application and the tests.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/transactional/__init__.py)
+application and the tests.](transactional)
 
 
-[And here's an example with different transactions.](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/non_transactional/__init__.py)
-
-
-## Create session with autorollback
-
-`rollback_session` creates a session that always rolls back automatically.
-
-```python
-from context_async_sqlalchemy.test_utils import rollback_session
-
-@pytest_asyncio.fixture
-async def db_session_test() -> AsyncGenerator[AsyncSession]:
-    """The session that is used inside the test"""
-    async with rollback_session(connection) as session:
-        yield session
-```
-
-## Override context
-
-- `set_test_context` creates a new context
-- `put_savepoint_session_in_ctx` puts into context a session that uses the
-same connection as `db_session_test`,  but if you commit in this session,
-then the transaction will not be committed, but save point will be released
-
-```python
-from context_async_sqlalchemy.test_utils import (
-    put_savepoint_session_in_ctx,
-    set_test_context,
-)
-
-@pytest_asyncio.fixture(autouse=True)
-async def db_session_override(
-    db_session_test: AsyncSession,
-) -> AsyncGenerator[None]:
-    """
-    The key thing about these tests is that we override the context in advance.
-    The middleware has a special check that won't initialize the context
-        if it already exists.
-    """
-    async with set_test_context():
-        async with put_savepoint_session_in_ctx(connection, db_session_test):
-            yield
-```
+[And here's an example with different transactions.](non_transactional)
