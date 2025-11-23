@@ -172,7 +172,7 @@ async def lifespan(app: FastAPI) -&gt; AsyncGenerator[None, Any]:
 <p>Middleware handles the most important and complex part -
 managing context and sessions.</p>
 <p>You can use the ready-made middleware components:</p>
-<h3 id="asgi-middleware">ASGI middleware</h3>
+<h3 id="asgi-middleware">Pure ASGI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
 
 app.add_middleware(ASGIHTTPDBSessionMiddleware)

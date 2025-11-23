@@ -81,7 +81,7 @@ managing context and sessions.
 
 You can use the ready-made middleware components:
 
-### ASGI middleware
+### Pure ASGI
 
 ```python
 from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
