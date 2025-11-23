@@ -1,4 +1,6 @@
-from starlette.types import ASGIApp, Receive, Scope, Send
+from collections.abc import Awaitable, MutableMapping
+from typing import Any, Callable
+
 from http import HTTPStatus
 
 from context_async_sqlalchemy import (
@@ -9,6 +11,12 @@ from context_async_sqlalchemy import (
     rollback_all_sessions,
 )
 
+Message = MutableMapping[str, Any]
+Receive = Callable[[], Awaitable[Message]]
+Scope = MutableMapping[str, Any]
+Send = Callable[[Message], Awaitable[None]]
+ASGIApp = Callable[[Scope, Receive, Send], Awaitable[None]]
+
 
 class ASGIHTTPDBSessionMiddleware:
     """Database session lifecycle management."""
@@ -16,7 +24,9 @@ class ASGIHTTPDBSessionMiddleware:
     def __init__(self, app: ASGIApp):
         self.app = app
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+    async def __call__(
+        self, scope: Scope, receive: Receive, send: Send
+    ) -> None:
         """
         Database session lifecycle management.
         The session itself is created on demand in db_session().
@@ -45,7 +55,7 @@ class ASGIHTTPDBSessionMiddleware:
 
         status_code = HTTPStatus.INTERNAL_SERVER_ERROR
 
-        async def send_wrapper(message):
+        async def send_wrapper(message: Message) -> None:
             nonlocal status_code
             if message["type"] == "http.response.start":
                 status_code = message["status"]

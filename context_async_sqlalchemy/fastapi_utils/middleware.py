@@ -5,7 +5,7 @@ from starlette.middleware.base import (  # type: ignore[attr-defined]
     RequestResponseEndpoint,
 )
 
-from context_async_sqlalchemy import (
+from context_async_sqlalchemy.starlette_utils import (
     add_starlette_http_db_session_middleware,
     starlette_http_db_session_middleware,
 )

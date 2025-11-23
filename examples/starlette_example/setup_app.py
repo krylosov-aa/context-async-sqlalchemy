@@ -6,7 +6,6 @@ from typing import Any, AsyncGenerator
 from starlette.applications import Starlette
 from starlette.routing import Route
 
-from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
 from context_async_sqlalchemy.starlette_utils import (
     add_starlette_http_db_session_middleware,
 )
