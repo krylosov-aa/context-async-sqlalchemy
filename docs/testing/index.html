@@ -103,7 +103,7 @@
 solved - ensuring data isolation between tests.</p>
 <p>There are basically two approaches:</p>
 <ol>
-<li>Separate sessions.</li>
+<li>Separate sessions</li>
 </ol>
 <p>The test has its own session that it uses to prepare data and verify
 results after execution.
@@ -111,7 +111,7 @@ The application also has its own session.
 Data isolation is achieved by clearing all tables at the end of each test
 (and once before running all tests).</p>
 <ol>
-<li>Shared session and transaction.
+<li>Shared session and transaction
 The test and the application share the same session and transaction.
 Data isolation is achieved by rolling back the transaction at
 the end of the test.</li>
