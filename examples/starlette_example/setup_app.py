@@ -6,7 +6,7 @@ from typing import Any, AsyncGenerator
 from starlette.applications import Starlette
 from starlette.routing import Route
 
-
+from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
 from context_async_sqlalchemy.starlette_utils import (
     add_starlette_http_db_session_middleware,
 )
@@ -29,7 +29,8 @@ def setup_app() -> Starlette:
     """
     A convenient entry point for app configuration.
     Convenient for testing.
-    You don't have to follow my example.
+
+    You don't have to follow my example here.
     """
     app = Starlette(
         debug=True,

@@ -26,7 +26,8 @@ def setup_app() -> FastAPI:
     """
     A convenient entry point for app configuration.
     Convenient for testing.
-    You don't have to follow my example (though I recommend it).
+
+    You don't have to follow my example here.
     """
     app = FastAPI(
         lifespan=lifespan,

@@ -22,6 +22,17 @@ def add_starlette_http_db_session_middleware(app: Starlette) -> None:
     )
 
 
+class StarletteHTTPDBSessionMiddleware(BaseHTTPMiddleware):
+    """Database session lifecycle management."""
+
+    async def dispatch(
+        self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
+        return await starlette_http_db_session_middleware(
+            request, call_next
+        )
+
+
 async def starlette_http_db_session_middleware(
     request: Request, call_next: RequestResponseEndpoint
 ) -> Response:
