@@ -141,9 +141,9 @@ They help create tests that share a common transaction between the test
 and the application, so data isolation between tests is achieved through
 fast transaction rollback.</p>
 <p>You can see these capabilities in the examples:</p>
-<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/transactional/__init__.py">Here are tests with a common transaction between the
+<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/transactional">Here are tests with a common transaction between the
 application and the tests.</a></p>
-<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/non_transactional/__init__.py">And here's an example with different transactions.</a></p>
+<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/non_transactional">And here's an example with different transactions.</a></p>
 <h2 id="create-session-with-autorollback">Create session with autorollback</h2>
 <p><code>rollback_session</code> creates a session that always rolls back automatically.</p>
 <pre><code class="language-python">from context_async_sqlalchemy.test_utils import rollback_session
