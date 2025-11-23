@@ -5,7 +5,13 @@ lint:
 	flake8 .
 
 test:
-	pytest --cov context_async_sqlalchemy examples/fastapi_example/tests --cov-report=term-missing
+	pytest --cov context_async_sqlalchemy examples/fastapi_example/tests examples/starlette_example/tests --cov-report=term-missing
+
+test_fastapi:
+	pytest examples/fastapi_example/tests
+
+test_starlette:
+	pytest examples/starlette_example/tests
 
 uv:
 	uv sync
