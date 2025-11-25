@@ -55,6 +55,16 @@
     <li class="toctree-l2"><a class="reference internal" href="#manage-database-connection-lifecycle">Manage Database connection lifecycle</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#setup-middleware">Setup middleware</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pure-asgi">Pure ASGI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fastapi">FastAPI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#starlette">Starlette</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#write-own">Write own</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#use-it">Use it</a>
     </li>
@@ -65,6 +75,10 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api">API Reference</a>
                 </li>
               </ul>
               <ul>
@@ -147,11 +161,15 @@ def create_session_maker(
 
 
 connection = DBConnect(
-    host=&quot;127.0.0.1&quot;,
     engine_creator=create_engine,
     session_maker_creator=create_session_maker,
+    host=&quot;127.0.0.1&quot;,  # optional
 )
 </code></pre>
+<p>The <strong>host</strong> parameter is optional if you use a handler
+before creating a session - <code>before_create_session_handler</code>.
+In that case, you can dynamically set the host.</p>
+<p>Read more in <a href="../master_replica">Master/Replica or several databases at the same time</a></p>
 <h2 id="manage-database-connection-lifecycle">Manage Database connection lifecycle</h2>
 <p>Close resources at the end of your application's lifecycle.</p>
 <p>Example for FastAPI:</p>
@@ -172,7 +190,7 @@ async def lifespan(app: FastAPI) -&gt; AsyncGenerator[None, Any]:
 <p>Middleware handles the most important and complex part -
 managing context and sessions.</p>
 <p>You can use the ready-made middleware components:</p>
-<h3 id="asgi-middleware">Pure ASGI</h3>
+<h3 id="pure-asgi">Pure ASGI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
 
 app.add_middleware(ASGIHTTPDBSessionMiddleware)

@@ -56,6 +56,10 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api">API Reference</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent SQL Queries</a>
                 </li>
               </ul>
@@ -70,6 +74,8 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">How middleware works</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#code-example">Code example</a>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -95,11 +101,33 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="how-middleware-works">How middleware works</h1>
-<p>Most of the work - and the “magic” - happens inside the middleware.
-The library aims to provide ready-made solutions so that you don’t have to
+<p>Most of the work - and the “magic” - happens inside the middleware.</p>
+<p>Here is a diagram describing how it works.</p>
+<p><img alt="middleware_schema.png" src="../img/middleware_schema.png" /></p>
+<p>At the beginning of a request, the middleware initializes a new
+asynchronous context.
+This asynchronous context is implemented using a contextvar.
+It holds a mutable container that stores sessions.</p>
+<p>A mutable container is used so that any coroutine, at any level, can
+create, modify, or close sessions, and those changes will
+affect the execution of the entire request.</p>
+<p>Whenever your code accesses the library’s functionality, it interacts with
+this container.</p>
+<p>Finally, the middleware checks the container for any active sessions and
+open transactions.
+If transactions are open, they are either committed when the query
+execution is successful or rolled back if it fails.
+After that, all sessions are closed.</p>
+<p>That’s precisely why you can safely close transactions and sessions early.
+The middleware simply works with whatever is in the container:
+if there’s anything left, it will close it properly; if you’ve
+already handled it yourself, the middleware only needs to reset the context.</p>
+<h2 id="code-example">Code example</h2>
+<p>The library aims to provide ready-made solutions so that you don’t have to
 worry about these details - but they’re not always available.</p>
 <p>So, let’s take a look at how Starlette middleware works.
 You can use this example as a reference to implement your own.</p>
+<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/context_async_sqlalchemy/starlette_utils/http_middleware.py#L34">CODE</a></p>
 <pre><code class="language-python">from starlette.middleware.base import (  # type: ignore[attr-defined]
     Request,
     Response,

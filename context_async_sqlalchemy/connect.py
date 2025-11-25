@@ -26,13 +26,13 @@ class DBConnect:
         before_create_session_handler: AsyncFunc | None = None,
     ) -> None:
         """
-        host: Specify the host to connect to. The connection is lazy.
-
         engine_creator: Specify a function that will return the
             configured AsyncEngine
 
         session_maker_creator: Specify a function that will return the
             configured async_sessionmaker
+
+        host: Specify the host to connect to. The connection is lazy.
 
         before_create_session_handler: You can specify a handler function that
             will be triggered before attempting to create a new session.

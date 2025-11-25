@@ -2,13 +2,14 @@ site_name: context-async-sqlalchemy
 repo_url: https://github.com/krylosov-aa/context-async-sqlalchemy
 theme:
   name: readthedocs
-  navigation_depth: 2
+  navigation_depth: 3
   collapse_navigation: true
 nav:
   - context-async-sqlalchemy: index.md
   - The Problem It Solves: problem.md
   - Getting Started: getting_started.md
   - Usage Examples: examples.md
+  - API Reference: api.md
   - Concurrent SQL Queries: concurrent_queries.md
   - Master/Replica or several databases at the same time: master_replica.md
   - Testing: testing.md

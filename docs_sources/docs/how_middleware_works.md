@@ -1,13 +1,42 @@
 # How middleware works
 
 Most of the work - and the “magic” - happens inside the middleware.
+
+Here is a diagram describing how it works.
+
+![middleware_schema.png](img/middleware_schema.png)
+
+At the beginning of a request, the middleware initializes a new
+asynchronous context.
+This asynchronous context is implemented using a contextvar.
+It holds a mutable container that stores sessions.
+
+A mutable container is used so that any coroutine, at any level, can
+create, modify, or close sessions, and those changes will
+affect the execution of the entire request.
+
+Whenever your code accesses the library’s functionality, it interacts with
+this container.
+
+Finally, the middleware checks the container for any active sessions and
+open transactions.
+If transactions are open, they are either committed when the query
+execution is successful or rolled back if it fails.
+After that, all sessions are closed.
+
+That’s precisely why you can safely close transactions and sessions early.
+The middleware simply works with whatever is in the container:
+if there’s anything left, it will close it properly; if you’ve
+already handled it yourself, the middleware only needs to reset the context.
+
+## Code example
 The library aims to provide ready-made solutions so that you don’t have to
 worry about these details - but they’re not always available.
-
 
 So, let’s take a look at how Starlette middleware works.
 You can use this example as a reference to implement your own.
 
+[CODE](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/context_async_sqlalchemy/starlette_utils/http_middleware.py#L34)
 
 ```python
 from starlette.middleware.base import (  # type: ignore[attr-defined]

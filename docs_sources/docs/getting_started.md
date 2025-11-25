@@ -45,11 +45,17 @@ def create_session_maker(
 
 
 connection = DBConnect(
-    host="127.0.0.1",
     engine_creator=create_engine,
     session_maker_creator=create_session_maker,
+    host="127.0.0.1",  # optional
 )
 ```
+
+The **host** parameter is optional if you use a handler
+before creating a session - `before_create_session_handler`.
+In that case, you can dynamically set the host.
+
+Read more in [Master/Replica or several databases at the same time](master_replica.md)
 
 
 ## Manage Database connection lifecycle
