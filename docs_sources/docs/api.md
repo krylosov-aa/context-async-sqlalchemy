@@ -284,3 +284,46 @@ await asyncio.gather(
     run_in_new_ctx(your_function_with_db_session, ...),
 )
 ```
+
+
+## Testing
+
+You can read more about testing here: [Testing](testing.md)
+
+### rollback_session
+```python
+@asynccontextmanager
+async def rollback_session(
+    connection: DBConnect,
+) -> AsyncGenerator[AsyncSession]:
+```
+A context manager that creates a session which is automatically rolled
+back at the end.
+It’s intended for use in fixtures to execute SQL queries during tests.
+
+---
+
+### set_test_context
+```python
+@asynccontextmanager
+async def set_test_context() -> AsyncGenerator[None]:
+```
+A context manager that creates a new context in which you can place a
+dedicated test session.
+It’s intended for use in tests where the test and the application share
+a single transaction.
+
+---
+
+### put_savepoint_session_in_ctx
+```python
+async def put_savepoint_session_in_ctx(
+    connection: DBConnect,
+    session: AsyncSession,
+) -> AsyncGenerator[None]:
+```
+Sets the context to a session that uses a save point instead of creating
+        a transaction. You need to pass the session you're using inside
+        your tests to attach a new session to the same connection.
+
+    It is important to use this function inside set_test_context.

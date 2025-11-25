@@ -108,6 +108,16 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rollback_session">rollback_session</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#set_test_context">set_test_context</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#put_savepoint_session_in_ctx">put_savepoint_session_in_ctx</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -197,7 +207,10 @@ as input and returns nothing.</p>
 <h3 id="connect">connect</h3>
 <pre><code class="language-python">async def connect(self: DBConnect, host: str) -&gt; None:
 </code></pre>
-<p>Establishes a connection to the specified host. This method doesn’t need to be called explicitly. If it isn’t called, the first session request will automatically establish the connection.</p>
+<p>Establishes a connection to the specified host.
+This method doesn’t need to be called explicitly.
+If it isn’t called, the first session request will automatically
+establish the connection.</p>
 <hr />
 <h3 id="change_host">change_host</h3>
 <pre><code class="language-python">async def change_host(self: DBConnect, host: str) -&gt; None:
@@ -349,6 +362,38 @@ session management when you don't want to use a context.</p>
     ),
     run_in_new_ctx(your_function_with_db_session, ...),
 )
+</code></pre>
+<h2 id="testing">Testing</h2>
+<p>You can read more about testing here: <a href="../testing">Testing</a></p>
+<h3 id="rollback_session">rollback_session</h3>
+<pre><code class="language-python">@asynccontextmanager
+async def rollback_session(
+    connection: DBConnect,
+) -&gt; AsyncGenerator[AsyncSession]:
+</code></pre>
+<p>A context manager that creates a session which is automatically rolled
+back at the end.
+It’s intended for use in fixtures to execute SQL queries during tests.</p>
+<hr />
+<h3 id="set_test_context">set_test_context</h3>
+<pre><code class="language-python">@asynccontextmanager
+async def set_test_context() -&gt; AsyncGenerator[None]:
+</code></pre>
+<p>A context manager that creates a new context in which you can place a
+dedicated test session.
+It’s intended for use in tests where the test and the application share
+a single transaction.</p>
+<hr />
+<h3 id="put_savepoint_session_in_ctx">put_savepoint_session_in_ctx</h3>
+<pre><code class="language-python">async def put_savepoint_session_in_ctx(
+    connection: DBConnect,
+    session: AsyncSession,
+) -&gt; AsyncGenerator[None]:
+</code></pre>
+<p>Sets the context to a session that uses a save point instead of creating
+        a transaction. You need to pass the session you're using inside
+        your tests to attach a new session to the same connection.</p>
+<pre><code>It is important to use this function inside set_test_context.
 </code></pre>
               
             </div>
