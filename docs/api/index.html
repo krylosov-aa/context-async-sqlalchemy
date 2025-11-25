@@ -197,7 +197,7 @@ as input and returns nothing.</p>
 <h3 id="connect">connect</h3>
 <pre><code class="language-python">async def connect(self: DBConnect, host: str) -&gt; None:
 </code></pre>
-<p>Establishes a connection to the specified host.</p>
+<p>Establishes a connection to the specified host. This method doesn’t need to be called explicitly. If it isn’t called, the first session request will automatically establish the connection.</p>
 <hr />
 <h3 id="change_host">change_host</h3>
 <pre><code class="language-python">async def change_host(self: DBConnect, host: str) -&gt; None:

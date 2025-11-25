@@ -67,6 +67,9 @@ async def renew_master_connect(connect: DBConnect) -> None:
 async def connect(self: DBConnect, host: str) -> None:
 ```
 Establishes a connection to the specified host.
+This method doesn’t need to be called explicitly.
+If it isn’t called, the first session request will automatically
+establish the connection.
 
 ---
 
