@@ -10,6 +10,7 @@ from context_async_sqlalchemy.fastapi_utils import (
 
 from .database import connection
 from .routes.atomic_usage import handler_with_db_session_and_atomic
+from .routes.atomic_usage_2 import handler_with_db_session_and_atomic_2
 from .routes.manual_commit import handler_with_db_session_and_manual_close
 from .routes.manual_rollback import handler_with_db_session_and_manual_rollback
 from .routes.multiple_session_usage import handler_multiple_sessions
@@ -57,6 +58,11 @@ def setup_routes(app: FastAPI) -> None:
     app.add_api_route(
         "/example_with_db_session_and_atomic",
         handler_with_db_session_and_atomic,
+        methods=["POST"],
+    )
+    app.add_api_route(
+        "/example_with_db_session_and_atomic_2",
+        handler_with_db_session_and_atomic_2,
         methods=["POST"],
     )
     app.add_api_route(

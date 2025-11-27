@@ -41,6 +41,8 @@ async def atomic_db_session(
             await session.execute(...)
     """
     session = await db_session(connect)
+    if session.in_transaction():
+        await session.commit()
     async with session.begin():
         yield session
 
