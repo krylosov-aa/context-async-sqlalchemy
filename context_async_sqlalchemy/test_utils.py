@@ -33,11 +33,11 @@ async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None]:
     Opens a context similar to middleware.
 
     Use auto_close=False if you’re using a test session and transaction
-        that you close manually elsewhere in your code.
+        that you close elsewhere in your code.
 
-    Use auto_close=True if, for example, you want to call a
-        function in a test that uses a context bypassing the
-        middleware, and you want all sessions to be closed automatically.
+    Use auto_close=True if you want to call a function
+        in a test that uses a context while the middleware is not
+        active, and you want all sessions to be closed automatically.
     """
     token = init_db_session_ctx()
     try:

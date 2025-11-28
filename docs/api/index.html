@@ -394,10 +394,10 @@ dedicated test session.
 It’s intended for use in tests where the test and the application share
 a single transaction.</p>
 <p>Use <code>auto_close=False</code> if you’re using a test session and transaction
-that you close manually elsewhere in your code.</p>
-<p>Use <code>auto_close=True</code> if, for example, you want to call a
-function in a test that uses a context bypassing the
-middleware, and you want all sessions to be closed automatically.</p>
+that you close elsewhere in your code.</p>
+<p>Use <code>auto_close=True</code> if you want to call a function
+in a test that uses a context while the middleware is not
+active, and you want all sessions to be closed automatically.</p>
 <hr />
 <h3 id="put_savepoint_session_in_ctx">put_savepoint_session_in_ctx</h3>
 <pre><code class="language-python">async def put_savepoint_session_in_ctx(
