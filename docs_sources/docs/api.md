@@ -205,6 +205,7 @@ There are several options that define how the function will handle
 an already open transaction.
 
 current_transaction:
+
 - `commit` - commits the open transaction and starts a new one
 - `rollback` - rolls back the open transaction and starts a new one
 - `append` - continues using the current transaction and commits it

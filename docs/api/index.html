@@ -305,11 +305,13 @@ async def atomic_db_session(
 uses a context session, making that call isolated within its own transaction.</p>
 <p>There are several options that define how the function will handle
 an already open transaction.</p>
-<p>current_transaction:
-- <code>commit</code> - commits the open transaction and starts a new one
-- <code>rollback</code> - rolls back the open transaction and starts a new one
-- <code>append</code> - continues using the current transaction and commits it
-- <code>raise</code> - raises an InvalidRequestError</p>
+<p>current_transaction:</p>
+<ul>
+<li><code>commit</code> - commits the open transaction and starts a new one</li>
+<li><code>rollback</code> - rolls back the open transaction and starts a new one</li>
+<li><code>append</code> - continues using the current transaction and commits it</li>
+<li><code>raise</code> - raises an InvalidRequestError</li>
+</ul>
 <hr />
 <h3 id="commit_db_session">commit_db_session</h3>
 <pre><code class="language-python">async def commit_db_session(connect: DBConnect) -&gt; None:
