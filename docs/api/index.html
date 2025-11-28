@@ -298,10 +298,18 @@ calls return the same session.</p>
 <pre><code class="language-python">@asynccontextmanager
 async def atomic_db_session(
     connect: DBConnect,
+    current_transaction: Literal[&quot;commit&quot;, &quot;rollback&quot;, &quot;append&quot;, &quot;raise&quot;] = &quot;commit&quot;,
 ) -&gt; AsyncGenerator[AsyncSession, None]:
 </code></pre>
 <p>A context manager that can be used to wrap another function which
 uses a context session, making that call isolated within its own transaction.</p>
+<p>There are several options that define how the function will handle
+an already open transaction.</p>
+<p>current_transaction:
+- <code>commit</code> - commits the open transaction and starts a new one
+- <code>rollback</code> - rolls back the open transaction and starts a new one
+- <code>append</code> - continues using the current transaction and commits it
+- <code>raise</code> - raises an InvalidRequestError</p>
 <hr />
 <h3 id="commit_db_session">commit_db_session</h3>
 <pre><code class="language-python">async def commit_db_session(connect: DBConnect) -&gt; None:
@@ -377,12 +385,17 @@ It’s intended for use in fixtures to execute SQL queries during tests.</p>
 <hr />
 <h3 id="set_test_context">set_test_context</h3>
 <pre><code class="language-python">@asynccontextmanager
-async def set_test_context() -&gt; AsyncGenerator[None]:
+async def set_test_context(auto_close: bool = False) -&gt; AsyncGenerator[None]:
 </code></pre>
 <p>A context manager that creates a new context in which you can place a
 dedicated test session.
 It’s intended for use in tests where the test and the application share
 a single transaction.</p>
+<p>Use <code>auto_close=False</code> if you’re using a test session and transaction
+that you close manually elsewhere in your code.</p>
+<p>Use <code>auto_close=True</code> if, for example, you want to call a
+function in a test that uses a context bypassing the
+middleware, and you want all sessions to be closed automatically.</p>
 <hr />
 <h3 id="put_savepoint_session_in_ctx">put_savepoint_session_in_ctx</h3>
 <pre><code class="language-python">async def put_savepoint_session_in_ctx(

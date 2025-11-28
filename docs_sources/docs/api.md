@@ -195,10 +195,20 @@ calls return the same session.
 @asynccontextmanager
 async def atomic_db_session(
     connect: DBConnect,
+    current_transaction: Literal["commit", "rollback", "append", "raise"] = "commit",
 ) -> AsyncGenerator[AsyncSession, None]:
 ```
 A context manager that can be used to wrap another function which
 uses a context session, making that call isolated within its own transaction.
+
+There are several options that define how the function will handle
+an already open transaction.
+
+current_transaction:
+- `commit` - commits the open transaction and starts a new one
+- `rollback` - rolls back the open transaction and starts a new one
+- `append` - continues using the current transaction and commits it
+- `raise` - raises an InvalidRequestError
 
 ---
 
@@ -306,12 +316,19 @@ It’s intended for use in fixtures to execute SQL queries during tests.
 ### set_test_context
 ```python
 @asynccontextmanager
-async def set_test_context() -> AsyncGenerator[None]:
+async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None]:
 ```
 A context manager that creates a new context in which you can place a
 dedicated test session.
 It’s intended for use in tests where the test and the application share
 a single transaction.
+
+Use `auto_close=False` if you’re using a test session and transaction
+that you close manually elsewhere in your code.
+
+Use `auto_close=True` if, for example, you want to call a
+function in a test that uses a context bypassing the
+middleware, and you want all sessions to be closed automatically.
 
 ---
 

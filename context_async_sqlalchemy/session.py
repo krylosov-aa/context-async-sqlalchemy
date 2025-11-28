@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Literal
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,13 +26,31 @@ async def db_session(connect: DBConnect) -> AsyncSession:
     return session
 
 
+_current_transaction_choices = Literal[
+    "commit",
+    "rollback",
+    "append",
+    "raise",
+]
+
+
 @asynccontextmanager
 async def atomic_db_session(
     connect: DBConnect,
+    current_transaction: _current_transaction_choices = "commit",
 ) -> AsyncGenerator[AsyncSession, None]:
     """
-    Autocommit or autorollback in place to avoid waiting for the end of the
-        request.
+    A context manager that can be used to wrap another function which
+        uses a context session, making that call isolated within its
+        own transaction.
+
+    There are several options that define how the function will handle
+        an already open transaction.
+    current_transaction:
+        "commit" - commits the open transaction and starts a new one
+        "rollback" - rolls back the open transaction and starts a new one
+        "append" - continues using the current transaction and commits it
+        "raise" - raises an InvalidRequestError
 
     example of use:
         async with atomic_db_session(connect) as session
@@ -42,9 +60,22 @@ async def atomic_db_session(
     """
     session = await db_session(connect)
     if session.in_transaction():
-        await session.commit()
-    async with session.begin():
-        yield session
+        if current_transaction == "commit":
+            await session.commit()
+        if current_transaction == "rollback":
+            await session.rollback()
+
+    if current_transaction == "append":
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+        else:
+            await session.commit()
+    else:
+        async with session.begin():
+            yield session
 
 
 async def commit_db_session(connect: DBConnect) -> None:

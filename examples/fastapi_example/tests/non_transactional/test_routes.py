@@ -10,6 +10,7 @@ from http import HTTPStatus
 
 from httpx import AsyncClient
 from sqlalchemy import exists, select
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from examples.fastapi_example.models import ExampleTable
@@ -67,16 +68,19 @@ async def test_example_with_db_session_and_atomic_2(
         such a handler should only be tested in non-transactional tests.
     """
     # Act
-    response = await client.post(
-        "/example_with_db_session_and_atomic_2",
-    )
+    try:
+        await client.post(
+            "/example_with_db_session_and_atomic_2",
+        )
+    except InvalidRequestError:
+        ...
+    else:
+        raise Exception()
 
     # Assert
-    assert response.status_code == HTTPStatus.OK
-
     result = await db_session_test.execute(select(ExampleTable))
     rows = result.scalars().all()
-    assert len(rows) == 2
+    assert len(rows) == 5
     for row in rows:
         assert row.text == "example_with_db_session_and_atomic"
 

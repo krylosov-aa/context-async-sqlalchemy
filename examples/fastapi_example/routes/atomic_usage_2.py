@@ -12,12 +12,32 @@ async def handler_with_db_session_and_atomic_2() -> None:
     You want to reuse this function, but you need to commit immediately,
         rather than wait for the request to complete.
     """
-    # This is a new transaction in a new connection
+    # Open transaction
     await _insert_1()
 
-    # If you want to wrap an operation in a new
-    # transaction, the current transaction will be committed automatically.
+    # autocommit current -> start and end new
     async with atomic_db_session(connection):
+        await _insert_1()
+
+    # Open transaction
+    await _insert_1()
+
+    # rollback current -> start and end new
+    async with atomic_db_session(connection, "rollback"):
+        await _insert_1()
+
+    # Open transaction
+    await _insert_1()
+
+    # use current transaction and commit
+    async with atomic_db_session(connection, "append"):
+        await _insert_1()
+
+    # Open transaction
+    await _insert_1()
+
+    # raise InvalidRequestError error
+    async with atomic_db_session(connection, "raise"):
         await _insert_1()
 
 

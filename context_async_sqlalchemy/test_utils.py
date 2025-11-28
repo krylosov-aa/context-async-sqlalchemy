@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from context_async_sqlalchemy import (
+    commit_all_sessions,
     DBConnect,
     init_db_session_ctx,
     put_db_session_to_context,
@@ -27,19 +28,27 @@ async def rollback_session(
 
 
 @asynccontextmanager
-async def set_test_context() -> AsyncGenerator[None]:
+async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None]:
     """
-    Opens a context similar to middleware, but doesn't commit or
-        rollback automatically. This task falls to the fixture in tests.
+    Opens a context similar to middleware.
+
+    Use auto_close=False if you’re using a test session and transaction
+        that you close manually elsewhere in your code.
+
+    Use auto_close=True if, for example, you want to call a
+        function in a test that uses a context bypassing the
+        middleware, and you want all sessions to be closed automatically.
     """
     token = init_db_session_ctx()
     try:
         yield
     finally:
+        if auto_close:
+            await commit_all_sessions()
         await reset_db_session_ctx(
             token,
-            # Don't close the session here, as you opened in fixture.
-            with_close=False,
+            # Don't close the session here if you opened in fixture.
+            with_close=auto_close,
         )
 
 
