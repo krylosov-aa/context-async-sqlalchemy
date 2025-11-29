@@ -116,7 +116,7 @@ async def close_db_session(connect: DBConnect) -> None:
         await your_function_with_db_session()
         await close_db_session(connect)
     """
-    session = pop_db_session_from_context(connect.context_key)
+    session = pop_db_session_from_context(connect)
     if session:
         await session.close()
 
