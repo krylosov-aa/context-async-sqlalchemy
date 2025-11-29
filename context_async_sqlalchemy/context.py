@@ -22,10 +22,10 @@ def is_context_initiated() -> bool:
     """
     Checks whether the context is initiated
     """
-    return bool(_db_session_ctx.get())
+    return _db_session_ctx.get() is not None
 
 
-def pop_db_session_from_context(context_key: str) -> AsyncSession | None:
+def pop_db_session_from_context(connect: DBConnect) -> AsyncSession | None:
     """
     Removes a session from the context
     """
@@ -33,7 +33,7 @@ def pop_db_session_from_context(context_key: str) -> AsyncSession | None:
     if not session_ctx:
         return None
 
-    session: AsyncSession | None = session_ctx.pop(context_key, None)
+    session: AsyncSession | None = session_ctx.pop(connect.context_key, None)
     return session
 
 
@@ -50,12 +50,12 @@ async def reset_db_session_ctx(
     _db_session_ctx.reset(token)
 
 
-def get_db_session_from_context(context_key: str) -> AsyncSession | None:
+def get_db_session_from_context(connect: DBConnect) -> AsyncSession | None:
     """
     Extracts the session from the context
     """
     session_ctx = _get_initiated_context()
-    return session_ctx.get(context_key)
+    return session_ctx.get(connect.context_key)
 
 
 def put_db_session_to_context(

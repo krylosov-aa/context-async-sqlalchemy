@@ -19,7 +19,7 @@ async def db_session(connect: DBConnect) -> AsyncSession:
         session = await db_session(connect)
         ...
     """
-    session = get_db_session_from_context(connect.context_key)
+    session = get_db_session_from_context(connect)
     if not session:
         session = await connect.create_session()
         put_db_session_to_context(connect, session)
@@ -86,7 +86,7 @@ async def commit_db_session(connect: DBConnect) -> None:
         await your_function_with_db_session()
         await commit_db_session(connect)
     """
-    session = get_db_session_from_context(connect.context_key)
+    session = get_db_session_from_context(connect)
     if session and session.in_transaction():
         await session.commit()
 
@@ -99,7 +99,7 @@ async def rollback_db_session(connect: DBConnect) -> None:
         await your_function_with_db_session()
         await rollback_db_session(connect)
     """
-    session = get_db_session_from_context(connect.context_key)
+    session = get_db_session_from_context(connect)
     if session and session.in_transaction():
         await session.rollback()
 

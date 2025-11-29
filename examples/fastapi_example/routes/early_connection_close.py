@@ -34,7 +34,5 @@ async def _insert() -> None:
         request.
     """
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text="example_with_early_connection_close"
-    )
+    stmt = insert(ExampleTable)
     await session.execute(stmt)

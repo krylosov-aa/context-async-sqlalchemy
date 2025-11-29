@@ -5,7 +5,7 @@ lint:
 	flake8 .
 
 test:
-	pytest --cov context_async_sqlalchemy examples/fastapi_example/tests examples/starlette_example/tests examples/fastapi_with_pure_asgi_example/tests --cov-report=term-missing
+	pytest --cov context_async_sqlalchemy tests examples/fastapi_example/tests examples/starlette_example/tests examples/fastapi_with_pure_asgi_example/tests --cov-report=term-missing
 
 test_fastapi:
 	pytest examples/fastapi_example/tests

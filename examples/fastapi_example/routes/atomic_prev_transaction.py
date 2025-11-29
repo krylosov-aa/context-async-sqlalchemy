@@ -54,5 +54,5 @@ async def atomic_and_previous_transaction() -> None:
 
 async def _insert_1() -> None:
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values()
+    stmt = insert(ExampleTable)
     await session.execute(stmt)

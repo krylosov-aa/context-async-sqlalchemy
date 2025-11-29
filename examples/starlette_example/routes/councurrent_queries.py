@@ -32,13 +32,17 @@ async def concurrent_queries(_: Request) -> JSONResponse:
         ),
         _insert_non_ctx(),  # new non context session
         _insert_non_ctx_manual(),  # new non context session
+        run_in_new_ctx(  # new context and session with autorollback
+            _insert_with_exception
+        ),
+        return_exceptions=True,
     )
     return JSONResponse({})
 
 
 async def _insert() -> None:
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values(text="example_multiple_sessions")
+    stmt = insert(ExampleTable)
     await session.execute(stmt)
 
 
@@ -60,7 +64,7 @@ async def _insert_non_ctx() -> None:
     You don't have to use the context to work with sessions at all
     """
     async with new_non_ctx_atomic_session(connection) as session:
-        stmt = insert(ExampleTable).values(text="example_multiple_sessions")
+        stmt = insert(ExampleTable)
         await session.execute(stmt)
 
 
@@ -69,6 +73,13 @@ async def _insert_non_ctx_manual() -> None:
     You don't have to use the context to work with sessions at all
     """
     async with new_non_ctx_session(connection) as session:
-        stmt = insert(ExampleTable).values(text="example_multiple_sessions")
+        stmt = insert(ExampleTable)
         await session.execute(stmt)
         await session.commit()
+
+
+async def _insert_with_exception() -> None:
+    session = await db_session(connection)
+    stmt = insert(ExampleTable)
+    await session.execute(stmt)
+    raise Exception()
