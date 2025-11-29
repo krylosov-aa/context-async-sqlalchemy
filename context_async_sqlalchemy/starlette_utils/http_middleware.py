@@ -17,9 +17,7 @@ from context_async_sqlalchemy import (
 
 def add_starlette_http_db_session_middleware(app: Starlette) -> None:
     """Adds middleware to the application"""
-    app.add_middleware(
-        BaseHTTPMiddleware, dispatch=starlette_http_db_session_middleware
-    )
+    app.add_middleware(StarletteHTTPDBSessionMiddleware)
 
 
 class StarletteHTTPDBSessionMiddleware(BaseHTTPMiddleware):

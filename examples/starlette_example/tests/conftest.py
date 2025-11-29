@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from context_async_sqlalchemy.test_utils import rollback_session
 from examples.database import connection
 from examples.models import ExampleTable
-from examples.starlette_example.setup_app import lifespan, setup_app
+from ..setup_app import lifespan, setup_app
 
 
 @pytest_asyncio.fixture

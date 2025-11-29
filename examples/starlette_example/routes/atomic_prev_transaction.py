@@ -38,6 +38,17 @@ async def atomic_and_previous_transaction(_: Request) -> JSONResponse:
     # Open transaction
     await _insert_1()
 
+    # use current transaction and rollback
+    try:
+        async with atomic_db_session(connection, "append"):
+            await _insert_1()
+            raise Exception()
+    except Exception:
+        ...
+
+    # Open transaction
+    await _insert_1()
+
     # raise InvalidRequestError error
     async with atomic_db_session(connection, "raise"):
         await _insert_1()
