@@ -1,15 +1,11 @@
-from starlette.requests import Request
-from starlette.responses import JSONResponse
 from context_async_sqlalchemy import db_session, rollback_db_session
 from sqlalchemy import insert
 
-from ..database import connection
-from ..models import ExampleTable
+from examples.database import connection
+from examples.models import ExampleTable
 
 
-async def handler_with_db_session_and_manual_rollback(
-    _: Request,
-) -> JSONResponse:
+async def early_rollback() -> None:
     """
     An example of a handle that uses a rollback
     """
@@ -22,12 +18,8 @@ async def handler_with_db_session_and_manual_rollback(
     session = await db_session(connection)
     await session.rollback()
 
-    return JSONResponse({})
-
 
 async def _insert() -> None:
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text="example_with_db_session_and_manual_close"
-    )
+    stmt = insert(ExampleTable)
     await session.execute(stmt)

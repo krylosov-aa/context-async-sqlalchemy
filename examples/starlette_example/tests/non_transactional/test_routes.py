@@ -9,181 +9,118 @@ import pytest
 from http import HTTPStatus
 
 from httpx import AsyncClient
-from sqlalchemy import exists, select
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from examples.starlette_example.models import ExampleTable
+from ..conftest import count_rows_example_table
 
 
 @pytest.mark.asyncio
-async def test_example_with_db_session(
+async def test_atomic_base_example(
     client: AsyncClient,
     db_session_test: AsyncSession,
 ) -> None:
-    # Act
-    response = await client.post(
-        "/example_with_db_session",
-    )
+    response = await client.post("/atomic_base_example")
 
-    # Assert
     assert response.status_code == HTTPStatus.OK
-
-    result = await db_session_test.execute(select(ExampleTable))
-    row = result.scalar_one()
-    assert row.text == "example_with_db_session"
+    assert await count_rows_example_table(db_session_test) == 2
 
 
 @pytest.mark.asyncio
-async def test_example_with_db_session_and_atomic(
+async def test_simple_usage(
     client: AsyncClient,
     db_session_test: AsyncSession,
 ) -> None:
-    """
-    Since the handler involves manual session management,
-        such a handler should only be tested in non-transactional tests.
-    """
-    # Act
-    response = await client.post(
-        "/example_with_db_session_and_atomic",
-    )
+    response = await client.post("/simple_usage")
 
-    # Assert
     assert response.status_code == HTTPStatus.OK
-
-    result = await db_session_test.execute(select(ExampleTable))
-    rows = result.scalars().all()
-    assert len(rows) == 2
-    for row in rows:
-        assert row.text == "example_with_db_session_and_atomic"
+    assert await count_rows_example_table(db_session_test) == 1
 
 
 @pytest.mark.asyncio
-async def test_example_with_db_session_and_manual_close(
+async def test_atomic_and_previous_transaction(
     client: AsyncClient,
     db_session_test: AsyncSession,
 ) -> None:
-    """
-    Since the handler involves manual session management,
-        such a handler should only be tested in non-transactional tests.
-    """
-    # Act
-    response = await client.post(
-        "/example_with_db_session_and_manual_close",
-    )
-
-    # Assert
-    assert response.status_code == HTTPStatus.OK
-
-    result = await db_session_test.execute(select(ExampleTable))
-    rows = result.scalars().all()
-    assert len(rows) == 4
-    for row in rows:
-        assert row.text == "example_with_db_session_and_manual_close"
-
-
-@pytest.mark.asyncio
-async def test_example_multiple_sessions(
-    client: AsyncClient,
-    db_session_test: AsyncSession,
-) -> None:
-    """
-    Since the handler involves manual session management,
-        such a handler should only be tested in non-transactional tests.
-    """
-    # Act
-    response = await client.post(
-        "/example_multiple_sessions",
-    )
-
-    # Assert
-    assert response.status_code == HTTPStatus.OK
-
-    result = await db_session_test.execute(select(ExampleTable))
-    rows = result.scalars().all()
-    assert len(rows) == 5
-    for row in rows:
-        assert row.text == "example_multiple_sessions"
-
-
-@pytest.mark.asyncio
-async def test_example_with_manual_rollback(
-    client: AsyncClient,
-    db_session_test: AsyncSession,
-) -> None:
-    """
-    Since the handler involves manual session management,
-        such a handler should only be tested in non-transactional tests.
-    """
-    # Act
-    response = await client.post(
-        "/example_with_manual_rollback",
-    )
-
-    # Assert
-    assert response.status_code == HTTPStatus.OK
-
-    exist_row = await db_session_test.execute(
-        select(exists().select_from(ExampleTable))
-    )
-    assert exist_row.scalar() is False
-
-
-@pytest.mark.asyncio
-async def test_example_with_exception(
-    client: AsyncClient,
-    db_session_test: AsyncSession,
-) -> None:
-    # Act
     try:
         await client.post(
-            "/example_with_exception",
+            "/atomic_and_previous_transaction",
+        )
+    except InvalidRequestError:
+        ...
+    else:
+        raise Exception()
+
+    assert await count_rows_example_table(db_session_test) == 5
+
+
+@pytest.mark.asyncio
+async def test_early_commit(
+    client: AsyncClient,
+    db_session_test: AsyncSession,
+) -> None:
+    response = await client.post("/early_commit")
+
+    assert response.status_code == HTTPStatus.OK
+    assert await count_rows_example_table(db_session_test) == 4
+
+
+@pytest.mark.asyncio
+async def test_concurrent_queries(
+    client: AsyncClient,
+    db_session_test: AsyncSession,
+) -> None:
+    response = await client.post("/concurrent_queries")
+
+    assert response.status_code == HTTPStatus.OK
+    assert await count_rows_example_table(db_session_test) == 5
+
+
+@pytest.mark.asyncio
+async def test_early_rollback(
+    client: AsyncClient,
+    db_session_test: AsyncSession,
+) -> None:
+    response = await client.post("/early_rollback")
+
+    assert response.status_code == HTTPStatus.OK
+    assert await count_rows_example_table(db_session_test) == 0
+
+
+@pytest.mark.asyncio
+async def test_auto_rollback_by_exception(
+    client: AsyncClient,
+    db_session_test: AsyncSession,
+) -> None:
+    try:
+        await client.post(
+            "/auto_rollback_by_exception",
         )
     except Exception:
         ...
     else:
         raise Exception("an exception was expected")
 
-    # Assert
-    exist_row = await db_session_test.execute(
-        select(exists().select_from(ExampleTable))
-    )
-    assert exist_row.scalar() is False
+    assert await count_rows_example_table(db_session_test) == 0
 
 
 @pytest.mark.asyncio
-async def test_example_with_http_exception(
+async def test_auto_rollback_by_status_code(
     client: AsyncClient,
     db_session_test: AsyncSession,
 ) -> None:
-    # Act
-    response = await client.post(
-        "/example_with_http_exception",
-    )
+    response = await client.post("/auto_rollback_by_status_code")
 
-    # Assert
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
-
-    exist_row = await db_session_test.execute(
-        select(exists().select_from(ExampleTable))
-    )
-    assert exist_row.scalar() is False
+    assert await count_rows_example_table(db_session_test) == 0
 
 
 @pytest.mark.asyncio
-async def test_example_with_early_connection_close(
+async def test_early_connection_close(
     client: AsyncClient,
     db_session_test: AsyncSession,
 ) -> None:
-    # Act
-    response = await client.post(
-        "/example_with_early_connection_close",
-    )
+    response = await client.post("/early_connection_close")
 
-    # Assert
     assert response.status_code == HTTPStatus.OK
-
-    result = await db_session_test.execute(select(ExampleTable))
-    rows = result.scalars().all()
-    assert len(rows) == 2
-    for row in rows:
-        assert row.text == "example_with_early_connection_close"
+    assert await count_rows_example_table(db_session_test) == 2

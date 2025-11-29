@@ -34,6 +34,6 @@ class ExampleTable(BaseTable):
     """just a table for example"""
 
     id: Mapped[uuid.UUID] = uuid_pk_column()
-    text: Mapped[str] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text, nullable=True)
 
     __tablename__ = "example"

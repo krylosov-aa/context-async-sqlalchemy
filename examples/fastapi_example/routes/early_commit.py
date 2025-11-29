@@ -1,6 +1,3 @@
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-
 from context_async_sqlalchemy import (
     close_db_session,
     commit_db_session,
@@ -8,11 +5,11 @@ from context_async_sqlalchemy import (
 )
 from sqlalchemy import insert
 
-from ..database import connection
-from ..models import ExampleTable
+from examples.database import connection
+from examples.models import ExampleTable
 
 
-async def handler_with_db_session_and_manual_close(_: Request) -> JSONResponse:
+async def early_commit() -> None:
     """
     An example of a handle that uses a session in context,
         but commits manually and even closes the session to release the
@@ -26,16 +23,12 @@ async def handler_with_db_session_and_manual_close(_: Request) -> JSONResponse:
     await _insert_3()
     # same connect -> same transaction
     await _insert_3()
-
-    return JSONResponse({})
     # autocommit
 
 
 async def _insert_1() -> None:
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text="example_with_db_session_and_manual_close"
-    )
+    stmt = insert(ExampleTable)
     await session.execute(stmt)
 
     # Here we closed the transaction
@@ -44,9 +37,7 @@ async def _insert_1() -> None:
 
 async def _insert_2() -> None:
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text="example_with_db_session_and_manual_close"
-    )
+    stmt = insert(ExampleTable)
     await session.execute(stmt)
 
     # Here we closed the transaction
@@ -61,7 +52,5 @@ async def _insert_2() -> None:
 
 async def _insert_3() -> None:
     session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text="example_with_db_session_and_manual_close"
-    )
+    stmt = insert(ExampleTable)
     await session.execute(stmt)

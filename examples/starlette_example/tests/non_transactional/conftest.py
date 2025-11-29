@@ -12,7 +12,7 @@ from starlette.applications import Starlette
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
-from examples.starlette_example.database import (
+from examples.database import (
     connection,
     create_engine,
     create_session_maker,

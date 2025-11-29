@@ -8,19 +8,17 @@ from context_async_sqlalchemy.fastapi_utils import (
     add_fastapi_http_db_session_middleware,
 )
 
-from .database import connection
-from .routes.atomic_usage import handler_with_db_session_and_atomic
-from .routes.atomic_usage_2 import handler_with_db_session_and_atomic_2
-from .routes.manual_commit import handler_with_db_session_and_manual_close
-from .routes.manual_rollback import handler_with_db_session_and_manual_rollback
-from .routes.multiple_session_usage import handler_multiple_sessions
-from .routes.early_connection_close import handler_with_early_connection_close
+from examples.database import connection
 
-from .routes.simple_usage import handler_with_db_session
-from .routes.simple_with_exception import handler_with_db_session_and_exception
-from .routes.simple_with_http_exception import (
-    handler_with_db_session_and_http_exception,
-)
+from .routes.atomic import atomic_base_example
+from .routes.atomic_prev_transaction import atomic_and_previous_transaction
+from .routes.auto_rollback_by_exception import auto_rollback_by_exception
+from .routes.auto_rollback_by_status_code import auto_rollback_by_status_code
+from .routes.councurrent_queries import concurrent_queries
+from .routes.early_commit import early_commit
+from .routes.early_connection_close import early_connection_close
+from .routes.early_rollback import early_rollback
+from .routes.simple_usage import simple_usage
 
 
 def setup_app() -> FastAPI:
@@ -51,47 +49,47 @@ def setup_routes(app: FastAPI) -> None:
     You don't have to do it exactly like this. I just prefer it that way.
     """
     app.add_api_route(
-        "/example_with_db_session",
-        handler_with_db_session,
+        "/atomic_base_example",
+        atomic_base_example,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_db_session_and_atomic",
-        handler_with_db_session_and_atomic,
+        "/atomic_and_previous_transaction",
+        atomic_and_previous_transaction,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_db_session_and_atomic_2",
-        handler_with_db_session_and_atomic_2,
+        "/simple_usage",
+        simple_usage,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_db_session_and_manual_close",
-        handler_with_db_session_and_manual_close,
+        "/early_commit",
+        early_commit,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_multiple_sessions",
-        handler_multiple_sessions,
+        "/concurrent_queries",
+        concurrent_queries,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_manual_rollback",
-        handler_with_db_session_and_manual_rollback,
+        "/early_rollback",
+        early_rollback,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_exception",
-        handler_with_db_session_and_exception,
+        "/auto_rollback_by_exception",
+        auto_rollback_by_exception,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_http_exception",
-        handler_with_db_session_and_http_exception,
+        "/auto_rollback_by_status_code",
+        auto_rollback_by_status_code,
         methods=["POST"],
     )
     app.add_api_route(
-        "/example_with_early_connection_close",
-        handler_with_early_connection_close,
+        "/early_connection_close",
+        early_connection_close,
         methods=["POST"],
     )

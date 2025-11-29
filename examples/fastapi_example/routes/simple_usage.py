@@ -2,11 +2,11 @@ from sqlalchemy import insert
 
 from context_async_sqlalchemy import db_session
 
-from ..database import connection
-from ..models import ExampleTable
+from examples.database import connection
+from examples.models import ExampleTable
 
 
-async def handler_with_db_session() -> None:
+async def simple_usage() -> None:
     """
     An example of a typical handle that uses a context session to work with
         a database.
@@ -18,7 +18,7 @@ async def handler_with_db_session() -> None:
     # even in child coroutines.
     session = await db_session(connection)
 
-    stmt = insert(ExampleTable).values(text="example_with_db_session")
+    stmt = insert(ExampleTable)
 
     # On the first request, a connection and transaction were opened
     await session.execute(stmt)

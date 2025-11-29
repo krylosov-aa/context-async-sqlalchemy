@@ -7,11 +7,11 @@ from context_async_sqlalchemy import (
 )
 from sqlalchemy import insert
 
-from ..database import connection
-from ..models import ExampleTable
+from examples.database import connection
+from examples.models import ExampleTable
 
 
-async def handler_with_early_connection_close(_: Request) -> JSONResponse:
+async def early_connection_close(_: Request) -> JSONResponse:
     """
     An example when you can return a connection to the connection pool for a
         long period of work unrelated to the database
@@ -27,7 +27,6 @@ async def handler_with_early_connection_close(_: Request) -> JSONResponse:
 
     # new connect and new transaction
     await _insert()
-
     return JSONResponse({})
 
 

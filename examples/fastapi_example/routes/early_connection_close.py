@@ -5,11 +5,11 @@ from context_async_sqlalchemy import (
 )
 from sqlalchemy import insert
 
-from ..database import connection
-from ..models import ExampleTable
+from examples.database import connection
+from examples.models import ExampleTable
 
 
-async def handler_with_early_connection_close() -> None:
+async def early_connection_close() -> None:
     """
     An example when you can return a connection to the connection pool for a
         long period of work unrelated to the database

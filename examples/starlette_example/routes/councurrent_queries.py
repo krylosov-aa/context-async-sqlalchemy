@@ -1,5 +1,6 @@
 import asyncio
-
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 from context_async_sqlalchemy import (
     close_db_session,
     commit_db_session,
@@ -10,11 +11,11 @@ from context_async_sqlalchemy import (
 )
 from sqlalchemy import insert
 
-from ..database import connection
-from ..models import ExampleTable
+from examples.database import connection
+from examples.models import ExampleTable
 
 
-async def handler_multiple_sessions() -> None:
+async def concurrent_queries(_: Request) -> JSONResponse:
     """
     In some situations, you need to have multiple sessions running
         simultaneously. For example, to run several queries concurrently.
@@ -32,6 +33,7 @@ async def handler_multiple_sessions() -> None:
         _insert_non_ctx(),  # new non context session
         _insert_non_ctx_manual(),  # new non context session
     )
+    return JSONResponse({})
 
 
 async def _insert() -> None:

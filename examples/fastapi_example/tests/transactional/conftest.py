@@ -19,7 +19,7 @@ from context_async_sqlalchemy.test_utils import (
     put_savepoint_session_in_ctx,
     set_test_context,
 )
-from examples.fastapi_example.database import connection
+from examples.database import connection
 
 
 @pytest_asyncio.fixture(autouse=True)
