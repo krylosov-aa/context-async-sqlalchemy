@@ -62,7 +62,7 @@ async def some_func() -> None:
 
 Here is a very simplified diagram of how everything works:
 
-![basic schema.png](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/docs_sources/docs/img/engine_session_schema.png?raw=true)
+![basic schema.png](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/docs_sources/docs/img/basic_schema.png?raw=true)
 
 1. Before executing your code, the middleware will prepare a container in
 which the sessions required by your code will be stored.
