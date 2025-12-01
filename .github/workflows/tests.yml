@@ -41,13 +41,21 @@ jobs:
       - name: Sync dependencies (prod + dev)
         run: uv sync --all-extras --dev
 
-      - name: Wait for Postgres to be ready
+      - name: Prepare database schema via SQL
         run: |
-          for i in $(seq 1 10); do
-            nc -zv 127.0.0.1 6432 && echo "Postgres is up!" && break
-            echo "Waiting for Postgres..."
-            sleep 3
-          done
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+
+          PGPASSWORD=test psql \
+            -h 127.0.0.1 \
+            -p 6432 \
+            -U krylosov-aa \
+            -d test \
+            -c "
+            CREATE TABLE IF NOT EXISTS example (
+              id   uuid default gen_random_uuid() not null,
+              text text
+            );
+            "
 
       - name: Run tests
         run: uv run pytest --cov context_async_sqlalchemy tests examples/fastapi_example/tests examples/starlette_example/tests examples/fastapi_with_pure_asgi_example/tests --cov-report=term-missing
