@@ -6,6 +6,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18
+        ports:
+          - 6432:6432
+        env:
+          POSTGRES_USER: krylosov-aa
+          POSTGRES_PASSWORD:
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd="pg_isready -U test -d test_db"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
     strategy:
       matrix:
         python-version: ["3.13", "3.14"]
