@@ -17,7 +17,7 @@ from examples.models import ExampleTable
 
 
 @pytest_asyncio.fixture
-async def app() -> AsyncGenerator[FastAPI]:
+async def app() -> AsyncGenerator[FastAPI, None]:
     """
     A new application for each test allows for complete isolation between
         tests.
@@ -28,7 +28,7 @@ async def app() -> AsyncGenerator[FastAPI]:
 
 
 @pytest_asyncio.fixture
-async def client(app: FastAPI) -> AsyncGenerator[AsyncClient]:
+async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     """Client for calling application handlers"""
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"

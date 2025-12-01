@@ -28,7 +28,7 @@ async def app() -> AsyncGenerator[Starlette]:
 
 
 @pytest_asyncio.fixture
-async def client(app: Starlette) -> AsyncGenerator[AsyncClient]:
+async def client(app: Starlette) -> AsyncGenerator[AsyncClient, None]:
     """Client for calling application handlers"""
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
