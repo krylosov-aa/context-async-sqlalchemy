@@ -10,16 +10,16 @@ jobs:
       postgres:
         image: postgres:18
         ports:
-          - 6432:6432
+          - 6432:5432
         env:
           POSTGRES_USER: krylosov-aa
           POSTGRES_PASSWORD: test
           POSTGRES_DB: test
         options: >-
-          --health-cmd="pg_isready -U test -d test_db"
+          --health-cmd="pg_isready -U krylosov-aa -d test"
           --health-interval=5s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
 
     strategy:
       matrix:
@@ -40,6 +40,14 @@ jobs:
 
       - name: Sync dependencies (prod + dev)
         run: uv sync --all-extras --dev
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in $(seq 1 10); do
+            nc -zv 127.0.0.1 6432 && echo "Postgres is up!" && break
+            echo "Waiting for Postgres..."
+            sleep 3
+          done
 
       - name: Run tests
         run: uv run pytest --cov context_async_sqlalchemy tests examples/fastapi_example/tests examples/starlette_example/tests examples/fastapi_with_pure_asgi_example/tests --cov-report=term-missing
