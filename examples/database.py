@@ -19,7 +19,7 @@ def create_engine(host: str) -> AsyncEngine:
 
     # In production code, you will probably take these parameters from env
     pg_user = "krylosov-aa"
-    pg_password = ""
+    pg_password = "test"
     pg_port = 6432
     pg_db = "test"
     return create_async_engine(

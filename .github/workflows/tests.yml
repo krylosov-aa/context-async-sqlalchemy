@@ -13,7 +13,7 @@ jobs:
           - 6432:6432
         env:
           POSTGRES_USER: krylosov-aa
-          POSTGRES_PASSWORD:
+          POSTGRES_PASSWORD: test
           POSTGRES_DB: test
         options: >-
           --health-cmd="pg_isready -U test -d test_db"
