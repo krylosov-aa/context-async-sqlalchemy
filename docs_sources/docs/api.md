@@ -317,7 +317,7 @@ It’s intended for use in fixtures to execute SQL queries during tests.
 ### set_test_context
 ```python
 @asynccontextmanager
-async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None]:
+async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None, None]:
 ```
 A context manager that creates a new context in which you can place a
 dedicated test session.
@@ -338,7 +338,7 @@ active, and you want all sessions to be closed automatically.
 async def put_savepoint_session_in_ctx(
     connection: DBConnect,
     session: AsyncSession,
-) -> AsyncGenerator[None]:
+) -> AsyncGenerator[None, None]:
 ```
 Sets the context to a session that uses a save point instead of creating
         a transaction. You need to pass the session you're using inside

@@ -173,7 +173,7 @@ then the transaction will not be committed, but save point will be released</li>
 @pytest_asyncio.fixture(autouse=True)
 async def db_session_override(
     db_session_test: AsyncSession,
-) -&gt; AsyncGenerator[None]:
+) -&gt; AsyncGenerator[None, None]:
     &quot;&quot;&quot;
     The key thing about these tests is that we override the context in advance.
     The middleware has a special check that won't initialize the context

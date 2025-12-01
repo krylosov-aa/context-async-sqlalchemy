@@ -22,7 +22,7 @@ from examples.database import (
 @pytest_asyncio.fixture(autouse=True)
 async def cleanup_tables_after(
     app: Starlette,  # To make the connection to the database in lifespan
-) -> AsyncGenerator[None]:
+) -> AsyncGenerator[None, None]:
     """
     After each test, we delete all data from the tables to isolate the data.
     We always clear the data after each test to avoid interfering with

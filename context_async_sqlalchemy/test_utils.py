@@ -28,7 +28,9 @@ async def rollback_session(
 
 
 @asynccontextmanager
-async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None]:
+async def set_test_context(
+    auto_close: bool = False,
+) -> AsyncGenerator[None, None]:
     """
     Opens a context similar to middleware.
 
@@ -56,7 +58,7 @@ async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None]:
 async def put_savepoint_session_in_ctx(
     connection: DBConnect,
     session: AsyncSession,
-) -> AsyncGenerator[None]:
+) -> AsyncGenerator[None, None]:
     """
     Sets the context to a session that uses a save point instead of creating
         a transaction. You need to pass the session you're using inside

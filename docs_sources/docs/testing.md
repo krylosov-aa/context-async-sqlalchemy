@@ -90,7 +90,7 @@ from context_async_sqlalchemy.test_utils import (
 @pytest_asyncio.fixture(autouse=True)
 async def db_session_override(
     db_session_test: AsyncSession,
-) -> AsyncGenerator[None]:
+) -> AsyncGenerator[None, None]:
     """
     The key thing about these tests is that we override the context in advance.
     The middleware has a special check that won't initialize the context
