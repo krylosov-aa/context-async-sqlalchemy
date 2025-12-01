@@ -379,7 +379,7 @@ session management when you don't want to use a context.</p>
 <pre><code class="language-python">@asynccontextmanager
 async def rollback_session(
     connection: DBConnect,
-) -&gt; AsyncGenerator[AsyncSession]:
+) -&gt; AsyncGenerator[AsyncSession, None]:
 </code></pre>
 <p>A context manager that creates a session which is automatically rolled
 back at the end.

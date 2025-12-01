@@ -306,7 +306,7 @@ You can read more about testing here: [Testing](testing.md)
 @asynccontextmanager
 async def rollback_session(
     connection: DBConnect,
-) -> AsyncGenerator[AsyncSession]:
+) -> AsyncGenerator[AsyncSession, None]:
 ```
 A context manager that creates a session which is automatically rolled
 back at the end.

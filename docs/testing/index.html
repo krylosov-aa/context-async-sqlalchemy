@@ -153,7 +153,7 @@ application and the tests.</a></p>
 <pre><code class="language-python">from context_async_sqlalchemy.test_utils import rollback_session
 
 @pytest_asyncio.fixture
-async def db_session_test() -&gt; AsyncGenerator[AsyncSession]:
+async def db_session_test() -&gt; AsyncGenerator[AsyncSession, None]:
     &quot;&quot;&quot;The session that is used inside the test&quot;&quot;&quot;
     async with rollback_session(connection) as session:
         yield session

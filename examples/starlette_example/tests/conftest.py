@@ -37,7 +37,7 @@ async def client(app: Starlette) -> AsyncGenerator[AsyncClient]:
 
 
 @pytest_asyncio.fixture
-async def db_session_test() -> AsyncGenerator[AsyncSession]:
+async def db_session_test() -> AsyncGenerator[AsyncSession, None]:
     """The session that is used inside the test"""
     async with rollback_session(connection) as session:
         yield session

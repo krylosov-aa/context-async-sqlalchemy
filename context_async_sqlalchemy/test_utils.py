@@ -17,7 +17,7 @@ from context_async_sqlalchemy import (
 @asynccontextmanager
 async def rollback_session(
     connection: DBConnect,
-) -> AsyncGenerator[AsyncSession]:
+) -> AsyncGenerator[AsyncSession, None]:
     """A session that always rolls back"""
     session_maker = await connection.session_maker()
     async with session_maker() as session:
