@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/context-async-sqlalchemy.svg)](https://pypi.org/project/context-async-sqlalchemy/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/context-async-sqlalchemy?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/context-async-sqlalchemy)
-[![Tests](https://github.com/krylosov-aa/context-async-sqlalchemy/actions/workflows/tests.yml/badge.svg)](https://github.com/krylosov-aa/context-async-sqlalchemy/actions/workflows/tests.yml) (coverage >90%)
+[![Tests](https://github.com/krylosov-aa/context-async-sqlalchemy/actions/workflows/tests.yml/badge.svg)](https://github.com/krylosov-aa/context-async-sqlalchemy/actions/workflows/tests.yml) (coverage > 90%)
 
 No AI was used in the creation of this library.
 
