@@ -2,11 +2,7 @@
 
 ## Supported Versions
 
-We actively support and maintain the following versions:
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 2.x.x   | ✅ |
+We actively support and maintain the latest version
 
 ## Reporting a Vulnerability
 
