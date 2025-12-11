@@ -14,7 +14,7 @@ It handles the lifecycle management of the engine, sessions, and
 transactions.
 
 The main goal is to provide quick and easy access to a session,
-without having to worry about opening or closing it when it’s not necessary.
+without worrying about opening or closing it when it’s not necessary.
 
 Key features:
 
