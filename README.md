@@ -6,11 +6,7 @@
 
 No AI was used in the creation of this library.
 
-- [DOCUMENTATION](https://krylosov-aa.github.io/context-async-sqlalchemy/)
-- [medium post](https://medium.com/p/e669882d3ac5)
-- [dev.to post](https://dev.to/krylosov-aa/context-async-sqlalchemy-the-best-way-to-use-sqlalchemy-in-an-async-python-application-c1b)
-- [dev hunt](https://devhunt.org/tool/context-async-sqlalchemy)
-
+[DOCUMENTATION](https://krylosov-aa.github.io/context-async-sqlalchemy/)
 
 Provides a super convenient way to work with SQLAlchemy in asynchronous
 applications.
