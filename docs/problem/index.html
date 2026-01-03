@@ -109,7 +109,7 @@
                 <h1 id="the-problem-it-solves">The Problem It Solves</h1>
 <p>SQLAlchemy uses an engine that manages the connection pool.
 The engine must remain active for as long as the application is
-running, so it can quickly provide ready-to-use connections whenever the
+running, providing ready-to-use connections whenever the
 application needs them.</p>
 <p>In the application, we work with sessions.
 A session obtains a single connection from the pool and should have a short
@@ -118,9 +118,8 @@ less.</p>
 <p><img alt="Engine_and_session.png" src="../img/engine_session_schema.png" /></p>
 <p>Let's see what existing solutions are available to manage sessions:</p>
 <h3 id="manual-solution">Manual solution</h3>
-<p>This is how the code ends up being duplicated,
-and two connections and two transactions are used - even though
-in many cases only one connection and one transaction are actually needed.</p>
+<p>This is how the code duplicates,
+and two connections and two transactions are in use - even when only one connection and one transaction are actually needed.</p>
 <pre><code class="language-python">@app.post(&quot;/users/&quot;)
 async def create_user(name):
     await insert_user(name)
@@ -155,7 +154,7 @@ async def insert_user(name, session):
 async def insert_user_profile(name, session):
     await session.execute(stmt)
 </code></pre>
-<p>But if you look at it more broadly, the code duplication doesn’t actually go
+<p>If you look at it more broadly, the code duplication doesn’t go
 away - you still have to do this in every handler.</p>
 <pre><code class="language-python">@app.post(&quot;/dogs/&quot;)
 async def create_dog(name):
@@ -170,9 +169,8 @@ async def create_cat(name):
         async with session.begin():
             ...
 </code></pre>
-<p>You also have to set everything up yourself.
-No ready-made integration solutions are used - which means freedom on one
-hand, but a lot of code on the other.</p>
+<p>You also have to set everything up manually.
+No ready-made integration solutions are available - which means freedom but also a lot of coding.</p>
 <h3 id="dependency">Dependency</h3>
 <p>You can use a dependency. For example, in FastAPI, it looks like this:</p>
 <pre><code class="language-python">async def get_atomic_session():

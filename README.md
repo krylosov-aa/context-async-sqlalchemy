@@ -18,12 +18,11 @@ without worrying about opening or closing it when it’s not necessary.
 
 Key features:
 
-- Extremely easy to use
 - Automatically manages the lifecycle of the engine, sessions, and
-transactions (autocommit / autorollback)
-- Does not interfere with manually opening or closing sessions and
-transactions when needed
-- Framework-agnostic - works with any web framework
+transactions
+- Allows for user autonomy when manually opening or closing sessions and
+transactions
+- Framework-agnostic
 - Not a wrapper around SQLAlchemy
 - Convenient for testing
 - Runtime host switching
@@ -32,7 +31,7 @@ transactions when needed
 - Fully lazy initialization
 
 
-## What does usage look like?
+## Example of a typical session
 
 ```python
 from context_async_sqlalchemy import db_session
@@ -62,17 +61,15 @@ async def some_func() -> None:
 
 ## How it works
 
-Here is a very simplified diagram of how everything works:
-
 ![basic schema.png](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/docs_sources/docs/img/basic_schema.png?raw=true)
 
-1. Before executing your code, the middleware will prepare a container in
-which the sessions required by your code will be stored.
-The container is saved in contextvars
+1. Before executing your code, the middleware prepares a container in
+which the sessions required by your code are stored.
+The container is saved in `contextvars`.
 2. Your code accesses the library to create new sessions and retrieve
-existing ones
-3. After your code, middleware will automatically commit or roll back open
-transactions. Closes open sessions and clears the context.
+existing ones.
+3. The middleware automatically commits or rolls back open
+transactions. It also closes open sessions and clears the context.
 
-The library also provides the ability to commit, rollback, and close at any
-time, without waiting for the end of the request, without any problems.
+The library also provides the ability to commit, roll back, and close at any
+time without waiting for the end of the request.

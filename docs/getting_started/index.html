@@ -52,7 +52,7 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#configure-the-connection-to-the-database">Configure the connection to the database</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#manage-database-connection-lifecycle">Manage Database connection lifecycle</a>
+    <li class="toctree-l2"><a class="reference internal" href="#manage-database-connection-lifecycle">Manage the database connection lifecycle</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#setup-middleware">Setup middleware</a>
         <ul>
@@ -120,7 +120,7 @@
               
                 <h1 id="getting-started">Getting started</h1>
 <h2 id="configure-the-connection-to-the-database">Configure the connection to the database</h2>
-<p>For example, for PostgreSQL - database.py:</p>
+<p>For example, for PostgreSQL's database.py:</p>
 <pre><code class="language-python">from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncEngine,
@@ -167,11 +167,11 @@ connection = DBConnect(
 )
 </code></pre>
 <p>The <strong>host</strong> parameter is optional if you use a handler
-before creating a session - <code>before_create_session_handler</code>.
-In that case, you can dynamically set the host.</p>
+before creating a session: <code>before_create_session_handler</code>.
+From there, you can dynamically set the host.</p>
 <p>Read more in <a href="../master_replica">Master/Replica or several databases at the same time</a></p>
 <h2 id="manage-database-connection-lifecycle">Manage Database connection lifecycle</h2>
-<p>Close resources at the end of your application's lifecycle.</p>
+<p>Close the resources at the end of your application's lifecycle.</p>
 <p>Example for FastAPI:</p>
 <pre><code class="language-python">from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
@@ -187,9 +187,14 @@ async def lifespan(app: FastAPI) -&gt; AsyncGenerator[None, Any]:
     await connection.close()  # Close the engine if it was open
 </code></pre>
 <h2 id="setup-middleware">Setup middleware</h2>
-<p>Middleware handles the most important and complex part -
-managing context and sessions.</p>
-<p>You can use the ready-made middleware components:</p>
+<p>Middleware handles the most important and complex parts:
+managing context and sessions. You can use ready-made middleware components:</p>
+
+<ul>
+  <li><a href="https://asgi.readthedocs.io/en/latest/">Pure ASGI</a></li>
+  <li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
+  <li><a href="https://starlette.dev/">Starlette</a></li>
+</ul>
 <h3 id="pure-asgi">Pure ASGI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
 
@@ -212,9 +217,9 @@ app = Starlette(...)
 add_starlette_http_db_session_middleware(app)
 </code></pre>
 <h3 id="write-own">Write own</h3>
-<p>If there’s no ready-made solution that fits your needs - don’t worry!
-You can check out <a href="../how_middleware_works">how it works</a> and implement your
-own.</p>
+<p>If there’s no ready-made solution that fits your needs, don’t worry!
+You can check out <a href="../how_middleware_works">implement your
+own</a>.</p>
 <h2 id="use-it">Use it</h2>
 <pre><code class="language-python">from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
@@ -241,15 +246,13 @@ async def some_func() -&gt; None:
     # The commit and closing of the session will occur automatically
 </code></pre>
 <h2 id="examples">Examples</h2>
-<p>The repository includes an example integration with FastAPI, demonstrating
-various workflows:
-<a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes">FastAPI example</a></p>
+<p>The repository includes an example integration with <a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes">FastAPI</a>, demonstrating various workflows.</p>
+FastAPI example</a></p>
 <p>It also contains two types of test setups that you can use in your own
 projects.</p>
 <p>All library tests are included within the examples - because we aim to
-test the functionality not in isolation, but in the context of a real
+test the functionality in the context of a real,
 asynchronous web application.
-<a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests">FastAPI tests example</a></p>
               
             </div>
           </div><footer>
