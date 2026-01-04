@@ -15,8 +15,7 @@ runtime if the master or replica changes.
 You’ll need third-party functionality to determine which host is the master
 or the replica.
 
-
-[Hopefully, I’ll be able to provide a ready-made solution for this soon.](https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2).
+#### I have an extremely lightweight microservice [pg-status](https://github.com/krylosov-aa/pg-status) that fits perfectly here.
 
 The engine is not created immediately when `DBConnect` is initialized -
 it is created only on the first request.
