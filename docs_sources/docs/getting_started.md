@@ -2,7 +2,7 @@
 
 ## Configure the connection to the database
 
-For example, for PostgreSQL - database.py:
+For example, for PostgreSQL's database.py:
 
 ```python
 from sqlalchemy.ext.asyncio import (
@@ -52,16 +52,16 @@ connection = DBConnect(
 ```
 
 The **host** parameter is optional if you use a handler
-before creating a session - `before_create_session_handler`.
-In that case, you can dynamically set the host.
+before creating a session: `before_create_session_handler`.
+From there, you can dynamically set the host.
 
 Read more in [Master/Replica or several databases at the same time](master_replica.md)
 
 
-## Manage Database connection lifecycle
+## Manage the database connection lifecycle
 
  
-Close resources at the end of your application's lifecycle.
+Close the resources at the end of your application's lifecycle.
 
 Example for FastAPI:
 
@@ -82,10 +82,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
 
 ## Setup middleware
 
-Middleware handles the most important and complex part -
+Middleware handles the most important and complex parts:
 managing context and sessions.
 
-You can use the ready-made middleware components:
+You can use ready-made middleware components:
 
 ### Pure ASGI
 
@@ -119,9 +119,8 @@ add_starlette_http_db_session_middleware(app)
 
 ### Write own
 
-If there’s no ready-made solution that fits your needs - don’t worry!
-You can check out [how it works](how_middleware_works.md) and implement your
-own.
+If there’s no ready-made solution that fits your needs, don’t worry!
+You can check out [how it works](how_middleware_works.md) implement your own.
 
 
 ## Use it
@@ -155,14 +154,13 @@ async def some_func() -> None:
 
 ## Examples
 
-The repository includes an example integration with FastAPI, demonstrating
-various workflows:
-[FastAPI example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes)
+The repository includes an example integration with [FastAPI](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes)
+demonstrating various workflows.
 
 It also contains two types of test setups that you can use in your own
 projects.
 
 All library tests are included within the examples - because we aim to
-test the functionality not in isolation, but in the context of a real
+test the functionality in the context of a real,
 asynchronous web application.
 [FastAPI tests example](https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests)
