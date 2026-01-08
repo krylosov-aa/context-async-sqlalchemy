@@ -76,7 +76,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#middlewares">Middlewares</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#fastapi">Fastapi</a>
+    <li class="toctree-l3"><a class="reference internal" href="#fastapi">FastAPI</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#starlette">Starlette</a>
     </li>
@@ -160,12 +160,14 @@
               
                 <h1 id="api-reference">API Reference</h1>
 <h2 id="dbconnect">DBConnect</h2>
-<p>DBConnect is responsible for managing the engine and the session_maker.
-You need to define two factories.
-Optionally, you can specify a host to connect to.
-You can also specify a handler that runs before a session is created -
-this handler can be used to connect to the host for the first time or
-to reconnect to a new one.</p>
+<p>DBConnect is responsible for managing the engine and <code>session_maker</code>.
+You need to define two factories:
+  <ul>
+    <li>Specify host to which you want to connect (optional).</li>
+    <li>Specify a handler that runs before a session is created. It be used to connect to the host for the first time or
+to reconnect to a new one.</li>
+   </ul>
+</p>
 <h3 id="init">init</h3>
 <pre><code class="language-python">def __init__(
     self: DBConnect,
@@ -215,7 +217,7 @@ establishes the connection.</p>
 <h3 id="change_host">change_host</h3>
 <pre><code class="language-python">async def change_host(self: DBConnect, host: str) -&gt; None:
 </code></pre>
-validates that the currently connected host is different
+Establishes a connection to the specified host. It validates that the currently connected host is different
 from the target host.</p>
 <hr />
 <h3 id="create_session">create_session</h3>
@@ -227,15 +229,15 @@ You never need to call it directly.</p>
 <h3 id="session_maker">session_maker</h3>
 <pre><code class="language-python">async def session_maker(self: DBConnect) -&gt; async_sessionmaker[AsyncSession]:
 </code></pre>
-<p>Provides access to the session_maker currently used to create sessions.</p>
+<p>Provides access to the <code>session_maker</code> currently used to create sessions.</p>
 <hr />
 <h3 id="close">close</h3>
 <pre><code class="language-python">async def close(self: DBConnect) -&gt; None:
 </code></pre>
 <p>Closes and cleans up all resources, freeing the connection pool.
-Use this call at the end of your application’s lifecycle.</p>
+Use this call at the end of your application’s life cycle.</p>
 <h2 id="middlewares">Middlewares</h2>
-<p>Most of the work and the “magic” happens inside the middleware. Check out <a href="../how_middleware_works">how it works</a> and implement your
+<p>Most of the work the “magic” happens inside the middleware. Check out <a href="../how_middleware_works">how it works</a> and implement your
 own.</p>
 <h3 id="fastapi">FastAPI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy.fastapi_utils import (
@@ -322,7 +324,7 @@ uses a context session, making that call isolated within its own transaction.</p
 <h3 id="close_db_session">close_db_session</h3>
 <pre><code class="language-python">async def close_db_session(connect: DBConnect) -&gt; None:
 </code></pre>
-<p>Closes the current context session, and returns the connection to the pool.
+<p>Closes the current context session and returns the connection to the pool.
 If you close an uncommitted transaction, the connection rolls back.</p>
 <p>This is useful if a database querly is needed at the beginning of the handle.</p>
 <p>You have have more work you need to complete over time without being able to keep the connection open.</p>

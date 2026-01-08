@@ -67,9 +67,9 @@ async def renew_master_connect(connect: DBConnect) -> None:
 async def connect(self: DBConnect, host: str) -> None:
 ```
 Establishes a connection to the specified host.
-This method doesn’t need to be called explicitly.
-If it isn’t called, the first session request will automatically
-establish the connection.
+It doesn’t need to be called explicitly.
+If you don't use the call, the first session request will automatically
+establishes the connection.
 
 ---
 
@@ -78,8 +78,7 @@ establish the connection.
 ```python
 async def change_host(self: DBConnect, host: str) -> None:
 ```
-Establishes a connection to the specified host, but first
-checks under a lock that the currently connected host is different
+Establishes a connection to the specified host. It then validates that the currently connected host is different
 from the target host.
 
 ---
@@ -89,10 +88,7 @@ from the target host.
 ```python
 async def create_session(self: DBConnect) -> AsyncSession:
 ```
-Creates a new session. Used internally by the library -
-you’ll probably never need to call it directly, but it’s
-good to know it exists.
-
+Creates a new session. Used internally by the library. You may never need to call it directly.
 ---
 
 ### session_maker
