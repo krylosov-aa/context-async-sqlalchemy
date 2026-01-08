@@ -67,9 +67,9 @@ async def renew_master_connect(connect: DBConnect) -> None:
 async def connect(self: DBConnect, host: str) -> None:
 ```
 Establishes a connection to the specified host.
-This method doesn’t need to be called explicitly.
-If it isn’t called, the first session request will automatically
-establish the connection.
+It doesn’t need to be called explicitly.
+If you don't use the call, the first session request will automatically
+establishes the connection.
 
 ---
 
@@ -78,8 +78,7 @@ establish the connection.
 ```python
 async def change_host(self: DBConnect, host: str) -> None:
 ```
-Establishes a connection to the specified host, but first
-checks under a lock that the currently connected host is different
+Establishes a connection to the specified host. It then validates that the currently connected host is different
 from the target host.
 
 ---
@@ -89,10 +88,7 @@ from the target host.
 ```python
 async def create_session(self: DBConnect) -> AsyncSession:
 ```
-Creates a new session. Used internally by the library -
-you’ll probably never need to call it directly, but it’s
-good to know it exists.
-
+Creates a new session. Used internally by the library. You may never need to call it directly.
 ---
 
 ### session_maker
@@ -177,7 +173,7 @@ app.add_middleware(ASGIHTTPDBSessionMiddleware)
 
 ## Sessions
 
-Here are the functions you’ll use most often from the library.
+Here are the library functions you will use most often.
 They allow you to work with sessions directly from your asynchronous code.
 
 ### db_session
@@ -185,7 +181,7 @@ They allow you to work with sessions directly from your asynchronous code.
 async def db_session(connect: DBConnect) -> AsyncSession:
 ```
 The most important function for obtaining a session in your code.
-When called for the first time, it returns a new session; subsequent
+Returns a new session when you call it for the first time; subsequent
 calls return the same session.
 
 ---
@@ -198,11 +194,11 @@ async def atomic_db_session(
     current_transaction: Literal["commit", "rollback", "append", "raise"] = "commit",
 ) -> AsyncGenerator[AsyncSession, None]:
 ```
-A context manager that can be used to wrap another function which
+A context manager you can use to wrap another function which
 uses a context session, making that call isolated within its own transaction.
 
 There are several options that define how the function will handle
-an already open transaction.
+an open transaction.
 
 current_transaction:
 
@@ -217,7 +213,7 @@ current_transaction:
 ```python
 async def commit_db_session(connect: DBConnect) -> None:
 ```
-Commits the active session, if there is one.
+Commits the active session.
 
 ---
 
@@ -225,7 +221,7 @@ Commits the active session, if there is one.
 ```python
 async def rollback_db_session(connect: DBConnect) -> None:
 ```
-Rollbacks the active session, if there is one.
+Rollbacks the active session.
 
 ---
 
@@ -234,11 +230,9 @@ Rollbacks the active session, if there is one.
 async def close_db_session(connect: DBConnect) -> None:
 ```
 Closes the current context session. The connection is returned to the pool.
-If you close an uncommitted transaction, the connection will be rolled back.
+If you close an uncommitted transaction, the connection rolls back.
 
-This is useful if, for example, at the beginning of the handle a
-        database query is needed, and then there is some other long-term work
-        and you don't want to keep the connection opened.
+Use if you have more work you need to complete without keeping the connection open.
 
 ---
 

@@ -25,7 +25,7 @@ transactions
 - Not a wrapper around SQLAlchemy
 - Convenient for testing
 - Runtime host switching
-- Supports multiple databases and multiple sessions per database
+- Supports multiple databases and sessions per database
 - Provides tools for running concurrent SQL queries
 - Fully lazy initialization
 
@@ -37,25 +37,25 @@ from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
 
 from database import connection  # your configured connection to the database
-from models import ExampleTable  # just some model for example
+from models import ExampleTable  # a model for example
 
 async def some_func() -> None:
-    # Created a session (no connection to the database yet)
+    # Creates a session with no connection to the database yet
     session = await db_session(connection)
     
     stmt = insert(ExampleTable).values(text="example_with_db_session")
 
-    # On the first request, a connection and transaction were opened
+    # A connection and transaction open in the first request.
     await session.execute(stmt)
     
-    # If you call db_session again, it will return the same session
+    # If you call db_session again, it returns the same session
     # even in child coroutines.
     session = await db_session(connection)
     
-    # The second request will use the same connection and the same transaction
+    # The second request uses the same connection and the same transaction
     await session.execute(stmt)
 
-    # The commit and closing of the session will occur automatically
+    # The commit and closing of the session occurs automatically
 ```
 
 ## How it works
@@ -70,5 +70,4 @@ existing ones.
 3. The middleware automatically commits or rolls back open
 transactions. It also closes open sessions and clears the context.
 
-The library also provides the ability to commit, roll back, and close at any
-time without waiting for the end of the request.
+The library provides the ability to commit, roll back, and close at any

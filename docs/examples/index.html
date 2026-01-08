@@ -187,8 +187,7 @@ from ..models import ExampleTable
 async def handler_with_db_session_and_manual_close() -&gt; None:
     &quot;&quot;&quot;
     An example of a handle that uses a session in context,
-        but commits manually and even closes the session to release the
-        connection.
+        but commits manually and closes the session to release the connection.
     &quot;&quot;&quot;
     # new connect -&gt; new transaction -&gt; commit
     await _insert_1()
@@ -208,7 +207,7 @@ async def _insert_1() -&gt; None:
     )
     await session.execute(stmt)
 
-    # Here we closed the transaction
+    # We closed the transaction
     await session.commit()  # or await commit_db_session()
 
 
@@ -219,13 +218,10 @@ async def _insert_2() -&gt; None:
     )
     await session.execute(stmt)
 
-    # Here we closed the transaction
+    # We closed the transaction
     await commit_db_session(connection)
-
-    # And here we closed the session = returned the connection to the pool
-    # This is useful if, for example, at the beginning of the handle a
-    # database query is needed, and then there is some other long-term work
-    # and you don't want to keep the connection opened.
+    # We closed the session, which returned the connection to the pool automatically.
+    # Use if you have more work you need to complete without keeping the connection open.
     await close_db_session(connection)
 
 
@@ -255,11 +251,11 @@ from ..models import ExampleTable
 
 async def handler_multiple_sessions() -&gt; None:
     &quot;&quot;&quot;
-    In some situations, you need to have multiple sessions running
-        simultaneously. For example, to run several queries concurrently.
+    You may need to to run multiple sessions. For example, to run several queries concurrently.
 
-    You can also use these same techniques to create new sessions whenever you
-        need them. Not necessarily just because of the concurrent processing.
+    You can also use the same techniques to create new sessions whenever you
+        need them, not necessarily because of the concurrent processing.
+
     &quot;&quot;&quot;
     await asyncio.gather(
         _insert(),  # context session
@@ -283,17 +279,16 @@ async def _insert_manual(text: str) -&gt; None:
     stmt = insert(ExampleTable).values(text=text)
     await session.execute(stmt)
 
-    # You can manually commit the transaction if you want, but it is not
-    #   necessary
+    # manually commits the transaction (optional)
     await commit_db_session(connection)
 
-    # You can manually close the session if you want, but it is not necessary
+    # manually closes the session (optional)
     await close_db_session(connection)
 
 
 async def _insert_non_ctx() -&gt; None:
     &quot;&quot;&quot;
-    You don't have to use the context to work with sessions at all
+    Using context to work with sessions is optional.
     &quot;&quot;&quot;
     async with new_non_ctx_atomic_session(connection) as session:
         stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
@@ -302,7 +297,7 @@ async def _insert_non_ctx() -&gt; None:
 
 async def _insert_non_ctx_manual() -&gt; None:
     &quot;&quot;&quot;
-    You don't have to use the context to work with sessions at all
+    Using context to work with sessions is optional.
     &quot;&quot;&quot;
     async with new_non_ctx_session(connection) as session:
         stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
@@ -326,7 +321,7 @@ async def handler_with_db_session_and_exception() -&gt; None:
     await session.execute(stmt)
 
     raise Exception(&quot;Some exception&quot;)
-    # transaction will be automatically rolled back
+    # transaction automatically rolls back
 </code></pre>
 <pre><code class="language-python">from fastapi import HTTPException
 
@@ -346,7 +341,7 @@ async def handler_with_db_session_and_http_exception() -&gt; None:
     await session.execute(stmt)
 
     raise HTTPException(status_code=500)
-    # transaction will be automatically rolled back by status code
+    # transaction rolls back automatically by status code
 </code></pre>
 <pre><code class="language-python">from context_async_sqlalchemy import db_session, rollback_db_session
 from sqlalchemy import insert

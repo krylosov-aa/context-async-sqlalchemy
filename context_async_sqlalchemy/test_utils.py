@@ -64,7 +64,7 @@ async def put_savepoint_session_in_ctx(
         a transaction. You need to pass the session you're using inside
         your tests to attach a new session to the same connection.
 
-    It is important to use this function inside set_test_context.
+    Use this function inside set_test_context.
     """
     session_maker = await connection.session_maker()
     async with session_maker(
