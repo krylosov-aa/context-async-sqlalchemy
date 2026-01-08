@@ -171,6 +171,6 @@ And this library solves all of these issues:
 
 - Easy integration with web frameworks
 - Automatic management of engine, session, and transaction lifecycles
-- Ability to manually close a session at any time, without waiting for the
+- Manually close a session at any time without waiting for the
 end of process
-- Access to a session from the context only where it’s actually needed
+- Access a session from the context only where it’s actually needed
