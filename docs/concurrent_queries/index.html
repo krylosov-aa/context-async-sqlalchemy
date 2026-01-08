@@ -126,11 +126,10 @@ from ..models import ExampleTable
 
 async def handler_multiple_sessions() -&gt; None:
     &quot;&quot;&quot;
-    In some situations, you need to have multiple sessions running
-        simultaneously. For example, to run several queries concurrently.
+    You may need to to run multiple sessions. For example, to run several queries concurrently.
 
-    You can also use these same techniques to create new sessions whenever you
-        need them. Not necessarily just because of the concurrent processing.
+    You can also use the same techniques to create new sessions whenever you
+        need them, ot necessarily because of the concurrent processing.
     &quot;&quot;&quot;
     await asyncio.gather(
         _insert(),  # context session
@@ -154,17 +153,16 @@ async def _insert_manual(text: str) -&gt; None:
     stmt = insert(ExampleTable).values(text=text)
     await session.execute(stmt)
 
-    # You can manually commit the transaction if you want, but it is not
-    #   necessary
+    # manually commits the transaction (optional)
     await commit_db_session(connection)
 
-    # You can manually close the session if you want, but it is not necessary
+    # manually closes the session (optional)
     await close_db_session(connection)
 
 
 async def _insert_non_ctx() -&gt; None:
     &quot;&quot;&quot;
-    You don't have to use the context to work with sessions at all
+    Using context to work with sessions is optional.
     &quot;&quot;&quot;
     async with new_non_ctx_atomic_session(connection) as session:
         stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
@@ -173,7 +171,7 @@ async def _insert_non_ctx() -&gt; None:
 
 async def _insert_non_ctx_manual() -&gt; None:
     &quot;&quot;&quot;
-    You don't have to use the context to work with sessions at all
+    Using context to work with sessions is optional.
     &quot;&quot;&quot;
     async with new_non_ctx_session(connection) as session:
         stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)

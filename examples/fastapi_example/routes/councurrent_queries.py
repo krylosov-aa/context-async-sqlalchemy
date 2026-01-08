@@ -16,11 +16,10 @@ from examples.models import ExampleTable
 
 async def concurrent_queries() -> None:
     """
-    In some situations, you need to have multiple sessions running
-        simultaneously. For example, to run several queries concurrently.
+    You may need to to run multiple sessions multiple sessions
 
     You can also use these same techniques to create new sessions whenever you
-        need them. Not necessarily just because of the concurrent processing.
+        need themm, not necessarily because of the concurrent processing.
     """
     await asyncio.gather(
         _insert(),  # context session
@@ -49,17 +48,16 @@ async def _insert_manual(text: str) -> None:
     stmt = insert(ExampleTable).values(text=text)
     await session.execute(stmt)
 
-    # You can manually commit the transaction if you want, but it is not
-    #   necessary
+    # manually commit the transaction (optional)
     await commit_db_session(connection)
 
-    # You can manually close the session if you want, but it is not necessary
+    # manually close the session (optional)
     await close_db_session(connection)
 
 
 async def _insert_non_ctx() -> None:
     """
-    You don't have to use the context to work with sessions at all
+    Using context to work with sessions is optional.
     """
     async with new_non_ctx_atomic_session(connection) as session:
         stmt = insert(ExampleTable)
@@ -68,7 +66,7 @@ async def _insert_non_ctx() -> None:
 
 async def _insert_non_ctx_manual() -> None:
     """
-    You don't have to use the context to work with sessions at all
+    Using context to work with sessions is optional.
     """
     async with new_non_ctx_session(connection) as session:
         stmt = insert(ExampleTable)

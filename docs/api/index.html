@@ -208,23 +208,21 @@ as input and returns nothing.</p>
 <pre><code class="language-python">async def connect(self: DBConnect, host: str) -&gt; None:
 </code></pre>
 <p>Establishes a connection to the specified host.
-This method doesn’t need to be called explicitly.
-If it isn’t called, the first session request will automatically
-establish the connection.</p>
+It doesn’t need to be called explicitly.
+The first session request automatically
+establishes the connection.</p>
 <hr />
 <h3 id="change_host">change_host</h3>
 <pre><code class="language-python">async def change_host(self: DBConnect, host: str) -&gt; None:
 </code></pre>
-<p>Establishes a connection to the specified host, but first
-checks under a lock that the currently connected host is different
+validates that the currently connected host is different
 from the target host.</p>
 <hr />
 <h3 id="create_session">create_session</h3>
 <pre><code class="language-python">async def create_session(self: DBConnect) -&gt; AsyncSession:
 </code></pre>
-<p>Creates a new session. Used internally by the library -
-you’ll probably never need to call it directly, but it’s
-good to know it exists.</p>
+<p>Creates a new session the library uses internally.
+You never need to call it directly.</p>
 <hr />
 <h3 id="session_maker">session_maker</h3>
 <pre><code class="language-python">async def session_maker(self: DBConnect) -&gt; async_sessionmaker[AsyncSession]:
@@ -234,13 +232,12 @@ good to know it exists.</p>
 <h3 id="close">close</h3>
 <pre><code class="language-python">async def close(self: DBConnect) -&gt; None:
 </code></pre>
-<p>Completely closes and cleans up all resources, freeing the connection pool.
-This should be called at the end of your application’s lifecycle.</p>
+<p>Closes and cleans up all resources, freeing the connection pool.
+Use this call at the end of your application’s lifecycle.</p>
 <h2 id="middlewares">Middlewares</h2>
-<p>Most of the work - and the “magic” - happens inside the middleware.</p>
-<p>You can check out <a href="../how_middleware_works">how it works</a> and implement your
+<p>Most of the work and the “magic” happens inside the middleware. Check out <a href="../how_middleware_works">how it works</a> and implement your
 own.</p>
-<h3 id="fastapi">Fastapi</h3>
+<h3 id="fastapi">FastAPI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy.fastapi_utils import (
     fastapi_http_db_session_middleware,
     add_fastapi_http_db_session_middleware,
@@ -285,7 +282,7 @@ app = SomeASGIApp(...)
 app.add_middleware(ASGIHTTPDBSessionMiddleware)
 </code></pre>
 <h2 id="sessions">Sessions</h2>
-<p>Here are the functions you’ll use most often from the library.
+<p>Here are the library functions you will use most often.
 They allow you to work with sessions directly from your asynchronous code.</p>
 <h3 id="db_session">db_session</h3>
 <pre><code class="language-python">async def db_session(connect: DBConnect) -&gt; AsyncSession:
@@ -303,8 +300,7 @@ async def atomic_db_session(
 </code></pre>
 <p>A context manager that can be used to wrap another function which
 uses a context session, making that call isolated within its own transaction.</p>
-<p>There are several options that define how the function will handle
-an already open transaction.</p>
+<p>Several options define how a function handles an open transaction.</p>
 <p>current_transaction:</p>
 <ul>
 <li><code>commit</code> - commits the open transaction and starts a new one</li>
@@ -316,21 +312,20 @@ an already open transaction.</p>
 <h3 id="commit_db_session">commit_db_session</h3>
 <pre><code class="language-python">async def commit_db_session(connect: DBConnect) -&gt; None:
 </code></pre>
-<p>Commits the active session, if there is one.</p>
+<p>Commits the active session.</p>
 <hr />
 <h3 id="rollback_db_session">rollback_db_session</h3>
 <pre><code class="language-python">async def rollback_db_session(connect: DBConnect) -&gt; None:
 </code></pre>
-<p>Rollbacks the active session, if there is one.</p>
+<p>Rolls back an active session.</p>
 <hr />
 <h3 id="close_db_session">close_db_session</h3>
 <pre><code class="language-python">async def close_db_session(connect: DBConnect) -&gt; None:
 </code></pre>
-<p>Closes the current context session. The connection is returned to the pool.
-If you close an uncommitted transaction, the connection will be rolled back.</p>
-<p>This is useful if, for example, at the beginning of the handle a
-        database query is needed, and then there is some other long-term work
-        and you don't want to keep the connection opened.</p>
+<p>Closes the current context session, and returns the connection to the pool.
+If you close an uncommitted transaction, the connection rolls back.</p>
+<p>This is useful if a database querly is needed at the beginning of the handle.</p>
+<p>You have have more work you need to complete over time without being able to keep the connection open.</p>
 <hr />
 <h3 id="new_non_ctx_session">new_non_ctx_session</h3>
 <pre><code class="language-python">@asynccontextmanager
@@ -338,9 +333,7 @@ async def new_non_ctx_session(
     connect: DBConnect,
 ) -&gt; AsyncGenerator[AsyncSession, None]:
 </code></pre>
-<p>A context manager that allows you to create a new session without placing
-it in a context. It's used for manual session management when you
-don't want to use a context.</p>
+<p>A context manager that allows you to create a new session without placing it in a context.</p>
 <hr />
 <h3 id="new_non_ctx_atomic_session">new_non_ctx_atomic_session</h3>
 <pre><code class="language-python">@asynccontextmanager
@@ -359,11 +352,11 @@ session management when you don't want to use a context.</p>
     **kwargs: Any,
 ) -&gt; AsyncCallableResult:
 </code></pre>
-<p>Runs a function in a new context with new sessions that have their
-        own connection.</p>
-<p>It will commit the transaction automatically if callable_func does not
-    raise exceptions. Otherwise, the transaction will be rolled back.</p>
-<p>The intended use is to run multiple database queries concurrently.</p>
+<p>Runs a function in a new context with new session(s) that have a
+        separate connection.</p>
+<p>It commits the transaction automatically if <code>callable_func</code> does not
+    raise exceptions. Otherwise, the transaction rolls back.</p>
+<p>It is intended to allow you to run multiple database queries concurrently.</p>
 <p>example of use:</p>
 <pre><code class="language-python">await asyncio.gather(
     your_function_with_db_session(...), 
@@ -374,16 +367,15 @@ session management when you don't want to use a context.</p>
 )
 </code></pre>
 <h2 id="testing">Testing</h2>
-<p>You can read more about testing here: <a href="../testing">Testing</a></p>
+
 <h3 id="rollback_session">rollback_session</h3>
 <pre><code class="language-python">@asynccontextmanager
 async def rollback_session(
     connection: DBConnect,
 ) -&gt; AsyncGenerator[AsyncSession, None]:
 </code></pre>
-<p>A context manager that creates a session which is automatically rolled
-back at the end.
-It’s intended for use in fixtures to execute SQL queries during tests.</p>
+<p>A context manager that creates a session which automatically rolls back at the end of the session.
+It is intended for you to use in fixtures to execute SQL queries during tests.</p>
 <hr />
 <h3 id="set_test_context">set_test_context</h3>
 <pre><code class="language-python">@asynccontextmanager
@@ -391,13 +383,12 @@ async def set_test_context(auto_close: bool = False) -&gt; AsyncGenerator[None, 
 </code></pre>
 <p>A context manager that creates a new context in which you can place a
 dedicated test session.
-It’s intended for use in tests where the test and the application share
-a single transaction.</p>
+It is intended to test the application when it shares a single transaction.</p>
 <p>Use <code>auto_close=False</code> if you’re using a test session and transaction
 that you close elsewhere in your code.</p>
-<p>Use <code>auto_close=True</code> if you want to call a function
+<p>Use <code>auto_close=True</code> to call a function
 in a test that uses a context while the middleware is not
-active, and you want all sessions to be closed automatically.</p>
+active. All sessions close automatically.</p>
 <hr />
 <h3 id="put_savepoint_session_in_ctx">put_savepoint_session_in_ctx</h3>
 <pre><code class="language-python">async def put_savepoint_session_in_ctx(
@@ -408,8 +399,11 @@ active, and you want all sessions to be closed automatically.</p>
 <p>Sets the context to a session that uses a save point instead of creating
         a transaction. You need to pass the session you're using inside
         your tests to attach a new session to the same connection.</p>
+
 <pre><code>It is important to use this function inside set_test_context.
 </code></pre>
+
+<p>Learn more about <a href="../testing">testing</a>.</p>
               
             </div>
           </div><footer>
