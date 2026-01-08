@@ -2,7 +2,7 @@
 
 SQLAlchemy uses an engine that manages the connection pool.
 The engine must remain active for as long as the application is
-running, so it can quickly provide ready-to-use connections whenever the
+running, providing ready-to-use connections whenever the
 application needs them.
 
 In the application, we work with sessions.
@@ -16,9 +16,9 @@ Let's see what existing solutions are available to manage sessions:
 
 ### Manual solution
 
-This is how the code ends up being duplicated,
-and two connections and two transactions are used - even though
-in many cases only one connection and one transaction are actually needed.
+This is how the code duplicates,
+and two connections and two transactions are in use - even when only one
+connection and one transaction are actually needed.
 
 ```python
 @app.post("/users/")
@@ -60,7 +60,7 @@ async def insert_user_profile(name, session):
     await session.execute(stmt)
 ```
 
-But if you look at it more broadly, the code duplication doesn’t actually go
+If you look at it more broadly, the code duplication doesn’t go
 away - you still have to do this in every handler.
 
 
@@ -79,9 +79,9 @@ async def create_cat(name):
             ...
 ```
 
-You also have to set everything up yourself.
-No ready-made integration solutions are used - which means freedom on one
-hand, but a lot of code on the other.
+You also have to set everything up manually.
+No ready-made integration solutions are available - which means freedom
+but also a lot of coding.
 
 ### Dependency
 

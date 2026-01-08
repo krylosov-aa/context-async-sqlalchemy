@@ -111,7 +111,7 @@ The before_create_session_handler hook allows you to change the host at
 runtime if the master or replica changes.
 You’ll need third-party functionality to determine which host is the master
 or the replica.</p>
-<p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/issues/2">Hopefully, I’ll be able to provide a ready-made solution for this soon.</a>.</p>
+<h4 id="change_host">I have an extremely lightweight microservice <a href="https://github.com/krylosov-aa/pg-status">pg-status</a> that fits perfectly here</h4>
 <p>The engine is not created immediately when <code>DBConnect</code> is initialized -
 it is created only on the first request.
 The library uses lazy initialization in many places.</p>
