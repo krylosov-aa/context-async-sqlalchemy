@@ -11,8 +11,8 @@ from examples.models import ExampleTable
 
 async def early_commit() -> None:
     """
-    An example of a handle that uses a session in context,
-        but commits manually and even closes the session to release the
+    A handle that uses a session in context,
+        but commits manually and  the session to release the
         connection.
     """
     # new connect -> new transaction -> commit
@@ -31,7 +31,7 @@ async def _insert_1() -> None:
     stmt = insert(ExampleTable)
     await session.execute(stmt)
 
-    # Here we closed the transaction
+    # We closed the transaction
     await session.commit()  # or await commit_db_session()
 
 
@@ -40,13 +40,11 @@ async def _insert_2() -> None:
     stmt = insert(ExampleTable)
     await session.execute(stmt)
 
-    # Here we closed the transaction
+    # We closed the transaction
     await commit_db_session(connection)
 
-    # And here we closed the session = returned the connection to the pool
-    # This is useful if, for example, at the beginning of the handle a
-    # database query is needed, and then there is some other long-term work
-    # and you don't want to keep the connection opened.
+    # We closed the session and returned the connection to the pool
+    # Use if you have more work you need to complete without keeping the connection open.
     await close_db_session(connection)
 
 

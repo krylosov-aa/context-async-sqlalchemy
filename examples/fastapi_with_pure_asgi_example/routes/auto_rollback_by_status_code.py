@@ -16,4 +16,4 @@ async def auto_rollback_by_status_code() -> None:
     await session.execute(stmt)
 
     raise HTTPException(status_code=500)
-    # transaction will be automatically rolled back by status code
+    # transaction rolls back automatically by status code

@@ -14,4 +14,4 @@ async def auto_rollback_by_exception() -> None:
     await session.execute(stmt)
 
     raise Exception("Some exception")
-    # transaction will be automatically rolled back
+    # transaction rolls back automatically

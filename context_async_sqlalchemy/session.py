@@ -40,12 +40,12 @@ async def atomic_db_session(
     current_transaction: _current_transaction_choices = "commit",
 ) -> AsyncGenerator[AsyncSession, None]:
     """
-    A context manager that can be used to wrap another function which
-        uses a context session, making that call isolated within its
+    A context manager that you can use to wrap another function which
+        uses a context session, isolating the call within its
         own transaction.
 
-    There are several options that define how the function will handle
-        an already open transaction.
+    There are several options that define how the function handles
+        an open transaction.
     current_transaction:
         "commit" - commits the open transaction and starts a new one
         "rollback" - rolls back the open transaction and starts a new one
@@ -80,7 +80,7 @@ async def atomic_db_session(
 
 async def commit_db_session(connect: DBConnect) -> None:
     """
-    Commits the active session, if there is one.
+    Commits the active session.
 
     example of use:
         await your_function_with_db_session()
@@ -93,7 +93,7 @@ async def commit_db_session(connect: DBConnect) -> None:
 
 async def rollback_db_session(connect: DBConnect) -> None:
     """
-    Rollbacks the active session, if there is one.
+    Rolls back the active session.
 
     example of use:
         await your_function_with_db_session()
@@ -108,9 +108,7 @@ async def close_db_session(connect: DBConnect) -> None:
     """
     Closes the active session (and connection), if there is one.
 
-    This is useful if, for example, at the beginning of the handle a
-        database query is needed, and then there is some other long-term work
-        and you don't want to keep the connection opened.
+    Use if you have more work you need to complete without keeping the connection open.
 
     example of use:
         await your_function_with_db_session()
