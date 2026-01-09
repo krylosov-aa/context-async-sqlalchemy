@@ -18,7 +18,7 @@
       </script>
     
     <!--[if lt IE 9]>
-    <script src="../js/html5shiv.min.js"></script>
+      <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
       <script>hljs.highlightAll();</script> 
@@ -58,31 +58,31 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../getting_started">Getting Started</a>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting Started</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="../examples/">Usage Examples</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../api">API Reference</a>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">API Reference</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent SQL Queries</a>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries/">Concurrent SQL Queries</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../master_replica">Master/Replica or several databases at the same time</a>
+                <li class="toctree-l1"><a class="reference internal" href="../master_replica/">Master/Replica or several databases at the same time</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../testing">Testing</a>
+                <li class="toctree-l1"><a class="reference internal" href="../testing/">Testing</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works">How middleware works</a>
+                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works/">How middleware works</a>
                 </li>
               </ul>
       </div>
@@ -100,6 +100,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
       <li class="breadcrumb-item active">The Problem It Solves</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/krylosov-aa/context-async-sqlalchemy/edit/master/docs/problem.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
@@ -119,7 +122,8 @@ less.</p>
 <p>Let's see what existing solutions are available to manage sessions:</p>
 <h3 id="manual-solution">Manual solution</h3>
 <p>This is how the code duplicates,
-and two connections and two transactions are in use - even when only one connection and one transaction are actually needed.</p>
+and two connections and two transactions are in use - even when only one
+connection and one transaction are actually needed.</p>
 <pre><code class="language-python">@app.post(&quot;/users/&quot;)
 async def create_user(name):
     await insert_user(name)
@@ -170,7 +174,8 @@ async def create_cat(name):
             ...
 </code></pre>
 <p>You also have to set everything up manually.
-No ready-made integration solutions are available - which means freedom but also a lot of coding.</p>
+No ready-made integration solutions are available - which means freedom
+but also a lot of coding.</p>
 <h3 id="dependency">Dependency</h3>
 <p>You can use a dependency. For example, in FastAPI, it looks like this:</p>
 <pre><code class="language-python">async def get_atomic_session():
@@ -243,14 +248,14 @@ challenging.</p>
 <li>Automatic management of engine, session, and transaction lifecycles</li>
 <li>Manually close a session at any time without waiting for the
 end of process</li>
-<li>Access to a session from the context only where it’s actually needed</li>
+<li>Access a session from the context only where it’s actually needed</li>
 </ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href=".." class="btn btn-neutral float-left" title="context-async-sqlalchemy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../getting_started" class="btn btn-neutral float-right" title="Getting Started">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../getting_started/" class="btn btn-neutral float-right" title="Getting Started">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -280,7 +285,7 @@ end of process</li>
       <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../getting_started" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../getting_started/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

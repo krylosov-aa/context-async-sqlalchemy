@@ -3,12 +3,12 @@
 
 ## DBConnect
 
-DBConnect is responsible for managing the engine and the session_maker.
-You need to define two factories.
-Optionally, you can specify a host to connect to.
-You can also specify a handler that runs before a session is created -
-this handler can be used to connect to the host for the first time or
-to reconnect to a new one.
+DBConnect is responsible for managing the engine and `session_maker`
+You need to define two factories:
+
+- Specify host to which you want to connect (optional).
+- Specify a handler that runs before a session is created.
+It will be used to connect to the host for the first time or to reconnect to a new one (optional).
 
 ### init
 ```python
@@ -88,7 +88,8 @@ from the target host.
 ```python
 async def create_session(self: DBConnect) -> AsyncSession:
 ```
-Creates a new session. Used internally by the library. You may never need to call it directly.
+Creates a new session the library uses internally.
+You never need to call it directly. (Only maybe in some special cases.)
 ---
 
 ### session_maker
@@ -96,7 +97,7 @@ Creates a new session. Used internally by the library. You may never need to cal
 ```python
 async def session_maker(self: DBConnect) -> async_sessionmaker[AsyncSession]:
 ```
-Provides access to the session_maker currently used to create sessions.
+Provides access to the `session_maker` currently used to create sessions.
 
 
 ---
@@ -106,19 +107,17 @@ Provides access to the session_maker currently used to create sessions.
 ```python
 async def close(self: DBConnect) -> None:
 ```
-Completely closes and cleans up all resources, freeing the connection pool.
-This should be called at the end of your application’s lifecycle.
+Closes and cleans up all resources, freeing the connection pool.
+Use this call at the end of your application’s life cycle.
 
 
 
 ## Middlewares
 
-Most of the work - and the “magic” - happens inside the middleware.
+Most of the work the “magic” happens inside the middleware. Check out
+[how it works](how_middleware_works.md) and implement your own if the ready-made ones don't fit.
 
-You can check out [how it works](how_middleware_works.md) and implement your
-own.
-
-### Fastapi
+### FastAPI
 ```python
 from context_async_sqlalchemy.fastapi_utils import (
     fastapi_http_db_session_middleware,
@@ -197,8 +196,7 @@ async def atomic_db_session(
 A context manager you can use to wrap another function which
 uses a context session, making that call isolated within its own transaction.
 
-There are several options that define how the function will handle
-an open transaction.
+Several options define how a function handles an open transaction.
 
 current_transaction:
 
@@ -221,7 +219,7 @@ Commits the active session.
 ```python
 async def rollback_db_session(connect: DBConnect) -> None:
 ```
-Rollbacks the active session.
+Rolls back an active session.
 
 ---
 
@@ -229,10 +227,11 @@ Rollbacks the active session.
 ```python
 async def close_db_session(connect: DBConnect) -> None:
 ```
-Closes the current context session. The connection is returned to the pool.
-If you close an uncommitted transaction, the connection rolls back.
+Closes the current context session and returns the connection to the pool.
+If you close an uncommitted transaction, the connection rolls back
 
-Use if you have more work you need to complete without keeping the connection open.
+This is useful when you need to run a database query at the start of the
+handler, then continue working over time without keeping the connection open.
 
 ---
 
@@ -243,9 +242,8 @@ async def new_non_ctx_session(
     connect: DBConnect,
 ) -> AsyncGenerator[AsyncSession, None]:
 ```
-A context manager that allows you to create a new session without placing
-it in a context. It's used for manual session management when you
-don't want to use a context.
+A context manager that allows you to create a new session without
+placing it in a context.
 
 ---
 
@@ -256,9 +254,12 @@ async def new_non_ctx_atomic_session(
     connect: DBConnect,
 ) -> AsyncGenerator[AsyncSession, None]:
 ```
-A context manager that allows you to create a new session with
-a new transaction that isn't placed in a context. It's used for manual
-session management when you don't want to use a context.
+Runs a function in a new context with new session(s) that have a separate connection.
+
+It commits the transaction automatically if <code>callable_func</code> does not
+raise exceptions. Otherwise, the transaction rolls back.
+
+It is intended to allow you to run multiple database queries concurrently.
 
 
 ## Context
@@ -271,13 +272,13 @@ async def run_in_new_ctx(
     **kwargs: Any,
 ) -> AsyncCallableResult:
 ```
-Runs a function in a new context with new sessions that have their
-        own connection.
+Runs a function in a new context with new session(s) that have a
+separate connection.
 
-It will commit the transaction automatically if callable_func does not
-    raise exceptions. Otherwise, the transaction will be rolled back.
+It commits the transaction automatically if `callable_func` does not
+raise exceptions. Otherwise, the transaction rolls back.
 
-The intended use is to run multiple database queries concurrently.
+It is intended to allow you to run multiple database queries concurrently.
 
 example of use:
 ```python
@@ -293,8 +294,6 @@ await asyncio.gather(
 
 ## Testing
 
-You can read more about testing here: [Testing](testing.md)
-
 ### rollback_session
 ```python
 @asynccontextmanager
@@ -302,9 +301,8 @@ async def rollback_session(
     connection: DBConnect,
 ) -> AsyncGenerator[AsyncSession, None]:
 ```
-A context manager that creates a session which is automatically rolled
-back at the end.
-It’s intended for use in fixtures to execute SQL queries during tests.
+A context manager that creates a session which automatically rolls back at the end of the session.
+It is intended for you to use in fixtures to execute SQL queries during tests.
 
 ---
 
@@ -315,15 +313,14 @@ async def set_test_context(auto_close: bool = False) -> AsyncGenerator[None, Non
 ```
 A context manager that creates a new context in which you can place a
 dedicated test session.
-It’s intended for use in tests where the test and the application share
-a single transaction.
+It is intended to test the application when it shares a single transaction.
 
 Use `auto_close=False` if you’re using a test session and transaction
 that you close elsewhere in your code.
 
 Use `auto_close=True` if you want to call a function
 in a test that uses a context while the middleware is not
-active, and you want all sessions to be closed automatically.
+active. All sessions close automatically.
 
 ---
 
@@ -339,3 +336,5 @@ Sets the context to a session that uses a save point instead of creating
         your tests to attach a new session to the same connection.
 
     It is important to use this function inside set_test_context.
+
+Learn more about [testing](testing.md)

@@ -31,10 +31,10 @@ from ..models import ExampleTable
 
 async def handler_multiple_sessions() -> None:
     """
-    You may need to to run multiple sessions. For example, to run several queries concurrently.
+    You may need to run multiple sessions. For example, to run several queries concurrently.
 
     You can also use the same techniques to create new sessions whenever you
-        need them, ot necessarily because of the concurrent processing.
+        need them, not necessarily because of the concurrent processing.
     """
     await asyncio.gather(
         _insert(),  # context session
