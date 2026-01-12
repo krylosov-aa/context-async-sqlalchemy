@@ -88,8 +88,7 @@ from the target host.
 ```python
 async def create_session(self: DBConnect) -> AsyncSession:
 ```
-Creates a new session the library uses internally.
-You never need to call it directly. (Only maybe in some special cases.)
+Creates a new session. Used internally by the library. You may never need to call it directly.
 ---
 
 ### session_maker
@@ -196,7 +195,8 @@ async def atomic_db_session(
 A context manager you can use to wrap another function which
 uses a context session, making that call isolated within its own transaction.
 
-Several options define how a function handles an open transaction.
+There are several options that define how the function will handle
+an open transaction.
 
 current_transaction:
 
@@ -219,7 +219,7 @@ Commits the active session.
 ```python
 async def rollback_db_session(connect: DBConnect) -> None:
 ```
-Rolls back an active session.
+Rollbacks the active session.
 
 ---
 
@@ -227,11 +227,10 @@ Rolls back an active session.
 ```python
 async def close_db_session(connect: DBConnect) -> None:
 ```
-Closes the current context session and returns the connection to the pool.
-If you close an uncommitted transaction, the connection rolls back
+Closes the current context session. The connection is returned to the pool.
+If you close an uncommitted transaction, the connection rolls back.
 
-This is useful when you need to run a database query at the start of the
-handler, then continue working over time without keeping the connection open.
+Use if you have more work you need to complete without keeping the connection open.
 
 ---
 

@@ -213,7 +213,7 @@ as input and returns nothing.</p>
 </code></pre>
 <p>Establishes a connection to the specified host.
 It doesn’t need to be called explicitly.
-If you don't use the call, the first session request will automatically
+The first session request automatically
 establishes the connection.</p>
 <hr />
 <h3 id="change_host">change_host</h3>
@@ -391,7 +391,7 @@ dedicated test session.
 It is intended to test the application when it shares a single transaction.</p>
 <p>Use <code>auto_close=False</code> if you’re using a test session and transaction
 that you close elsewhere in your code.</p>
-<p>Use <code>auto_close=True</code> if you want to call a function
+<p>Use <code>auto_close=True</code> to call a function
 in a test that uses a context while the middleware is not
 active. All sessions close automatically.</p>
 <hr />
@@ -404,6 +404,7 @@ active. All sessions close automatically.</p>
 <p>Sets the context to a session that uses a save point instead of creating
         a transaction. You need to pass the session you're using inside
         your tests to attach a new session to the same connection.</p>
+
 <pre><code>It is important to use this function inside set_test_context.
 </code></pre>
 <p>Learn more about <a href="../testing/">testing</a></p>
