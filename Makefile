@@ -23,5 +23,8 @@ build:
 publish:
 	uv publish
 
-build_docs:
+docs_build:
 	mkdocs build -f docs_sources/mkdocs.yml -d ../docs
+
+docs_serve:
+	mkdocs serve -f docs_sources/mkdocs.yml

@@ -111,21 +111,19 @@ There are two approaches:</p>
 <ol>
 <li>
 <p><strong>Separate sessions</strong>: The test uses its own session that prepares data and
-verifies results after execution. The application also has its own session.</p>
-</li>
-<li>
-<p>It is a more "honest" way to test the application.</p>
-</li>
+   verifies results after execution. The application also has its own session.</p>
+<ul>
+<li>It is a more "honest" way to test the application.</li>
 <li>Verifies how it handles sessions and transactions automatically.</li>
-<li>
-<p>The ability to inspect the database state when the test is paused.
-Complex session management scenarios make other test methods difficult or impossible (e.g., concurrent query execution).</p>
+<li>The ability to inspect the database state when the test is paused.</li>
+<li>Complex session management scenarios make other test methods difficult or impossible (e.g., concurrent query execution).</li>
+</ul>
 </li>
 <li>
 <p><strong>Shared session and transaction</strong>: The test and the application share the same session and transaction.</p>
-</li>
-<li>
-<p>Rolling back transactions is faster and takes less time than starting a new session.</p>
+<ul>
+<li>Rolling back transactions is faster and takes less time than starting a new session.</li>
+</ul>
 </li>
 </ol>
 <p>In my projects, I use both approaches at the same time:</p>

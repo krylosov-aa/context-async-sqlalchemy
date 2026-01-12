@@ -5,16 +5,17 @@ When testing with a real database, one important problem needs to be solved: ens
 There are two approaches:
 
 1. **Separate sessions**: The test uses its own session that prepares data and
-verifies results after execution. The application also has its own session.
+   verifies results after execution. The application also has its own session.
 
-- It is a more "honest" way to test the application.
-- Verifies how it handles sessions and transactions automatically.
-- The ability to inspect the database state when the test is paused.
-Complex session management scenarios make other test methods difficult or impossible (e.g., concurrent query execution).
+    - It is a more "honest" way to test the application.
+    - Verifies how it handles sessions and transactions automatically.
+    - The ability to inspect the database state when the test is paused.
+    - Complex session management scenarios make other test methods difficult or impossible (e.g., concurrent query execution).
 
 2. **Shared session and transaction**: The test and the application share the same session and transaction.
 
-- Rolling back transactions is faster and takes less time than starting a new session.
+    - Rolling back transactions is faster and takes less time than starting a new session.
+
 
 
 In my projects, I use both approaches at the same time:
