@@ -98,22 +98,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="masterreplica-or-several-databases-at-the-same-time">Master/Replica or several databases at the same time</h1>
-<p>This is why <code>db_session</code> and other functions accept a <code>DBConnect</code> instance as
-input.
-This approach allows you to work with multiple hosts simultaneously -
-for example, with both a master and a replica.</p>
-<p><code>DBConnect</code> can also accept factory functions instead of ready-made objects,
-making it easy to switch hosts when needed.</p>
-<p>For example, <code>libpq</code> can detect the master and replica when creating an engine,
+                <h1 id="masterreplica-or-several-databases-at-the-same-time">Using multiple databases at the same time (master/replica)</h1>
+                <p><code>db_session</code> and other functions accept a <code>DBConnect</code> instance as input. This approach allows you to work with multiple hosts simultaneously. This system allows you to manage scalability and version control.</p>
+                <ul>
+                  <li><b>Master:</b> The primary database which runs the "live" version of your information, the location of your primary data set. The master database
+                    handles INSERT, DELETE, and UPDATE API calls.
+                  </li>
+                  <li><b>Replicas:</b> Secondary database(s) which run READ-ONLY versions of your information and receive updates from the master database.</li>
+                </ul>
+<p><code>DBConnect</code> accepts factory functions instead of ready-made objects, making it easy to switch hosts when needed.</p>
+
+<p><code>libpq</code> can detect the master and replica when creating an engine,
 but it only does this once - at creation time.
-The before_create_session_handler hook allows you to change the host at
+The <code>before_create_session_handler</code> hook allows you to change the host at
 runtime if the master or replica changes.
-You’ll need third-party functionality to determine which host is the master
-or the replica.</p>
+
+<p><b>You need third-party functionality to determine which host is the master or the replica.</b></p>
 <h4 id="change_host">I have an extremely lightweight microservice <a href="https://github.com/krylosov-aa/pg-status">pg-status</a> that fits perfectly here</h4>
-<p>The engine is not created immediately when <code>DBConnect</code> is initialized -
-it is created only on the first request.
+<p>The engine is not created when <code>DBConnect</code> initializes, also known as lazy initialization. It is created only on the first request.
 The library uses lazy initialization in many places.</p>
 <pre><code class="language-python">from context_async_sqlalchemy import DBConnect
 
