@@ -106,30 +106,36 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="testing">Testing</h1>
-<p>When testing with a real database, one important problem needs to be solved: ensuring data isolation between tests. There are two approaches:
-  <ol>
-    <li><b>Separate sessions</b>: The test uses its own session that prepares data and verifies results after execution. The application also has its own session.
-    <ul>
-      <li>It is a more "honest" way to test the application.</li>
-      <li>Verifies how it handles sessions and transactions automatically.</li>
-      <li>The ability to inspect the database state when the test is paused.</li>
-      <li>Complex session management scenarios make other test methods difficult or impossible (e.g., concurrent query execution).</li>
-    </ul>
-    <li><b>Shared session and transaction:</b> The test and the application share the same session and transaction.
-    <ul>
-      <li>Rolling back transactions is faster and takes less time than starting a new session.</li>
-      </ul>
-  </ol>
-</p>
-
+<p>When testing with a real database, one important problem needs to be solved: ensuring data isolation between tests.
+There are two approaches:</p>
+<ol>
+<li>
+<p><strong>Separate sessions</strong>: The test uses its own session that prepares data and
+verifies results after execution. The application also has its own session.</p>
+</li>
+<li>
+<p>It is a more "honest" way to test the application.</p>
+</li>
+<li>Verifies how it handles sessions and transactions automatically.</li>
+<li>
+<p>The ability to inspect the database state when the test is paused.
+Complex session management scenarios make other test methods difficult or impossible (e.g., concurrent query execution).</p>
+</li>
+<li>
+<p><strong>Shared session and transaction</strong>: The test and the application share the same session and transaction.</p>
+</li>
+<li>
+<p>Rolling back transactions is faster and takes less time than starting a new session.</p>
+</li>
+</ol>
 <p>In my projects, I use both approaches at the same time:</p>
 <ul>
 <li>For most tests with simple or common logic, I use a shared transaction for the test and the application</li>
 <li>For more complex cases, or ones that cannot be tested with separate sessions, I use separate transactions.</li>
 </ul>
-<p>The library provides several utilities that can be used in tests (e.g., fixtures). They create tests that share a common transaction between the test
-and the application. You achieve data isolation by rolling back transactions.
-
+<p>The library provides several utilities that can be used in tests (e.g., fixtures).
+They create tests that share a common transaction between the test
+and the application. You achieve data isolation by rolling back transactions.</p>
 <p>You can see these capabilities in the examples:</p>
 <p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/tests/transactional">Here are tests with a common transaction between the
 application and the tests.</a></p>

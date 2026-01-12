@@ -68,6 +68,10 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#create_session">create_session</a>
     </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creates-a-new-session-used-internally-by-the-library-you-may-never-need-to-call-it-directly">Creates a new session. Used internally by the library. You may never need to call it directly.</a>
+        <ul>
     <li class="toctree-l3"><a class="reference internal" href="#session_maker">session_maker</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#close">close</a>
@@ -213,8 +217,7 @@ as input and returns nothing.</p>
 </code></pre>
 <p>Establishes a connection to the specified host.
 It doesn’t need to be called explicitly.
-The first session request automatically
-establishes the connection.</p>
+The first session request automatically establishes the connection.</p>
 <hr />
 <h3 id="change_host">change_host</h3>
 <pre><code class="language-python">async def change_host(self: DBConnect, host: str) -&gt; None:
@@ -225,9 +228,7 @@ from the target host.</p>
 <h3 id="create_session">create_session</h3>
 <pre><code class="language-python">async def create_session(self: DBConnect) -&gt; AsyncSession:
 </code></pre>
-<p>Creates a new session the library uses internally.
-You never need to call it directly. (Only maybe in some special cases.)</p>
-<hr />
+<h2 id="creates-a-new-session-used-internally-by-the-library-you-may-never-need-to-call-it-directly">Creates a new session. Used internally by the library. You may never need to call it directly.</h2>
 <h3 id="session_maker">session_maker</h3>
 <pre><code class="language-python">async def session_maker(self: DBConnect) -&gt; async_sessionmaker[AsyncSession]:
 </code></pre>
@@ -304,7 +305,8 @@ async def atomic_db_session(
 </code></pre>
 <p>A context manager you can use to wrap another function which
 uses a context session, making that call isolated within its own transaction.</p>
-<p>Several options define how a function handles an open transaction.</p>
+<p>There are several options that define how the function will handle
+an open transaction.</p>
 <p>current_transaction:</p>
 <ul>
 <li><code>commit</code> - commits the open transaction and starts a new one</li>
@@ -321,15 +323,14 @@ uses a context session, making that call isolated within its own transaction.</p
 <h3 id="rollback_db_session">rollback_db_session</h3>
 <pre><code class="language-python">async def rollback_db_session(connect: DBConnect) -&gt; None:
 </code></pre>
-<p>Rolls back an active session.</p>
+<p>Rollbacks the active session.</p>
 <hr />
 <h3 id="close_db_session">close_db_session</h3>
 <pre><code class="language-python">async def close_db_session(connect: DBConnect) -&gt; None:
 </code></pre>
-<p>Closes the current context session and returns the connection to the pool.
-If you close an uncommitted transaction, the connection rolls back</p>
-<p>This is useful when you need to run a database query at the start of the
-handler, then continue working over time without keeping the connection open.</p>
+<p>Closes the current context session. The connection is returned to the pool.
+If you close an uncommitted transaction, the connection rolls back.</p>
+<p>Use if you have more work you need to complete without keeping the connection open.</p>
 <hr />
 <h3 id="new_non_ctx_session">new_non_ctx_session</h3>
 <pre><code class="language-python">@asynccontextmanager
@@ -404,7 +405,6 @@ active. All sessions close automatically.</p>
 <p>Sets the context to a session that uses a save point instead of creating
         a transaction. You need to pass the session you're using inside
         your tests to attach a new session to the same connection.</p>
-
 <pre><code>It is important to use this function inside set_test_context.
 </code></pre>
 <p>Learn more about <a href="../testing/">testing</a></p>

@@ -1,24 +1,25 @@
-# Master/Replica or several databases at the same time
+# Using multiple database hosts (master/replica)
 
-This is why `db_session` and other functions accept a `DBConnect` instance as
+`db_session` and other functions accept a `DBConnect` instance as
 input.
-This approach allows you to work with multiple hosts simultaneously -
-for example, with both a master and a replica.
+This approach allows you to work with multiple hosts simultaneously.
+This system allows you to manage scalability and reliability.
 
-`DBConnect` can also accept factory functions instead of ready-made objects,
-making it easy to switch hosts when needed.
+- **Master** (also called **Primary**): The main database host that handles all write operations (INSERT, UPDATE, DELETE) and read operations. It is the single source of truth
+- **Replica** (also called **Standby** or **Secondary**): Secondary database host(s) which run READ-ONLY versions of your information and receive updates from the master database.
 
-For example, `libpq` can detect the master and replica when creating an engine,
+`DBConnect` accepts factory functions instead of ready-made objects, making it easy to switch hosts when needed.
+
+`libpq` can detect the master and replica when creating an engine,
 but it only does this once - at creation time.
-The before_create_session_handler hook allows you to change the host at
+The `before_create_session_handler` hook allows you to change the host at
 runtime if the master or replica changes.
-You’ll need third-party functionality to determine which host is the master
-or the replica.
+You need third-party functionality to determine which host is the master or the replica.
 
 #### I have an extremely lightweight microservice [pg-status](https://github.com/krylosov-aa/pg-status) that fits perfectly here.
 
-The engine is not created immediately when `DBConnect` is initialized -
-it is created only on the first request.
+The engine is not created when `DBConnect` initializes, also known as lazy initialization.
+It is created only on the first request.
 The library uses lazy initialization in many places.
 
 ```python

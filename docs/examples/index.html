@@ -223,6 +223,7 @@ async def _insert_2() -&gt; None:
 
     # We closed the transaction
     await commit_db_session(connection)
+
     # We closed the session, which returned the connection to the pool automatically.
     # Use if you have more work you need to complete without keeping the connection open.
     await close_db_session(connection)

@@ -121,7 +121,7 @@ async def _insert_2() -> None:
     # We closed the transaction
     await commit_db_session(connection)
 
-    # We closed the session and returned the connection to the pool.
+    # We closed the session, which returned the connection to the pool automatically.
     # Use if you have more work you need to complete without keeping the connection open.
     await close_db_session(connection)
 
@@ -227,7 +227,7 @@ async def handler_with_db_session_and_exception() -> None:
     await session.execute(stmt)
 
     raise Exception("Some exception")
-    # transaction rolls back automatically
+    # transaction automatically rolls back
 ```
 
 ```python

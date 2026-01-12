@@ -68,8 +68,7 @@ async def connect(self: DBConnect, host: str) -> None:
 ```
 Establishes a connection to the specified host.
 It doesn’t need to be called explicitly.
-If you don't use the call, the first session request will automatically
-establishes the connection.
+The first session request automatically establishes the connection.
 
 ---
 
@@ -317,7 +316,7 @@ It is intended to test the application when it shares a single transaction.
 Use `auto_close=False` if you’re using a test session and transaction
 that you close elsewhere in your code.
 
-Use `auto_close=True` if you want to call a function
+Use `auto_close=True` to call a function
 in a test that uses a context while the middleware is not
 active. All sessions close automatically.
 
