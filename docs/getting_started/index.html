@@ -18,7 +18,7 @@
       </script>
     
     <!--[if lt IE 9]>
-    <script src="../js/html5shiv.min.js"></script>
+      <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
       <script>hljs.highlightAll();</script> 
@@ -44,7 +44,7 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../problem">The Problem It Solves</a>
+                <li class="toctree-l1"><a class="reference internal" href="../problem/">The Problem It Solves</a>
                 </li>
               </ul>
               <ul class="current">
@@ -52,7 +52,7 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#configure-the-connection-to-the-database">Configure the connection to the database</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#manage-database-connection-lifecycle">Manage the database connection lifecycle</a>
+    <li class="toctree-l2"><a class="reference internal" href="#manage-the-database-connection-lifecycle">Manage the database connection lifecycle</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#setup-middleware">Setup middleware</a>
         <ul>
@@ -74,27 +74,27 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../examples">Usage Examples</a>
+                <li class="toctree-l1"><a class="reference internal" href="../examples/">Usage Examples</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../api">API Reference</a>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">API Reference</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries">Concurrent SQL Queries</a>
+                <li class="toctree-l1"><a class="reference internal" href="../concurrent_queries/">Concurrent SQL Queries</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../master_replica">Master/Replica or several databases at the same time</a>
+                <li class="toctree-l1"><a class="reference internal" href="../master_replica/">Master/Replica or several databases at the same time</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../testing">Testing</a>
+                <li class="toctree-l1"><a class="reference internal" href="../testing/">Testing</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works">How middleware works</a>
+                <li class="toctree-l1"><a class="reference internal" href="../how_middleware_works/">How middleware works</a>
                 </li>
               </ul>
       </div>
@@ -112,6 +112,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
       <li class="breadcrumb-item active">Getting Started</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/krylosov-aa/context-async-sqlalchemy/edit/master/docs/getting_started.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
@@ -169,8 +172,8 @@ connection = DBConnect(
 <p>The <strong>host</strong> parameter is optional if you use a handler
 before creating a session: <code>before_create_session_handler</code>.
 From there, you can dynamically set the host.</p>
-<p>Read more in <a href="../master_replica">Master/Replica or several databases at the same time</a></p>
-<h2 id="manage-database-connection-lifecycle">Manage Database connection lifecycle</h2>
+<p>Read more in <a href="../master_replica/">Master/Replica or several databases at the same time</a></p>
+<h2 id="manage-the-database-connection-lifecycle">Manage the database connection lifecycle</h2>
 <p>Close the resources at the end of your application's lifecycle.</p>
 <p>Example for FastAPI:</p>
 <pre><code class="language-python">from contextlib import asynccontextmanager
@@ -188,13 +191,8 @@ async def lifespan(app: FastAPI) -&gt; AsyncGenerator[None, Any]:
 </code></pre>
 <h2 id="setup-middleware">Setup middleware</h2>
 <p>Middleware handles the most important and complex parts:
-managing context and sessions. You can use ready-made middleware components:</p>
-
-<ul>
-  <li><a href="https://asgi.readthedocs.io/en/latest/">Pure ASGI</a></li>
-  <li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
-  <li><a href="https://starlette.dev/">Starlette</a></li>
-</ul>
+managing context and sessions.</p>
+<p>You can use ready-made middleware components:</p>
 <h3 id="pure-asgi">Pure ASGI</h3>
 <pre><code class="language-python">from context_async_sqlalchemy import ASGIHTTPDBSessionMiddleware
 
@@ -218,8 +216,7 @@ add_starlette_http_db_session_middleware(app)
 </code></pre>
 <h3 id="write-own">Write own</h3>
 <p>If there’s no ready-made solution that fits your needs, don’t worry!
-You can check out <a href="../how_middleware_works">implement your
-own</a>.</p>
+You can check out <a href="../how_middleware_works/">how it works</a> implement your own.</p>
 <h2 id="use-it">Use it</h2>
 <pre><code class="language-python">from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
@@ -246,19 +243,20 @@ async def some_func() -&gt; None:
     # The commit and closing of the session will occur automatically
 </code></pre>
 <h2 id="examples">Examples</h2>
-<p>The repository includes an example integration with <a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes">FastAPI</a>, demonstrating various workflows.</p>
-FastAPI example</a></p>
+<p>The repository includes an example integration with <a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/routes">FastAPI</a>
+demonstrating various workflows.</p>
 <p>It also contains two types of test setups that you can use in your own
 projects.</p>
 <p>All library tests are included within the examples - because we aim to
 test the functionality in the context of a real,
 asynchronous web application.
+<a href="https://github.com/krylosov-aa/context-async-sqlalchemy/tree/main/examples/fastapi_example/tests">FastAPI tests example</a></p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../problem" class="btn btn-neutral float-left" title="The Problem It Solves"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../examples" class="btn btn-neutral float-right" title="Usage Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../problem/" class="btn btn-neutral float-left" title="The Problem It Solves"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../examples/" class="btn btn-neutral float-right" title="Usage Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -285,10 +283,10 @@ asynchronous web application.
         </span>
     
     
-      <span><a href="../problem" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../problem/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../examples" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

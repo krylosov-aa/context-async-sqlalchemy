@@ -16,10 +16,10 @@ from examples.models import ExampleTable
 
 async def concurrent_queries() -> None:
     """
-    You may need to to run multiple sessions multiple sessions
+    You may need to run multiple sessions
 
     You can also use these same techniques to create new sessions whenever you
-        need themm, not necessarily because of the concurrent processing.
+        need them, not necessarily because of the concurrent processing.
     """
     await asyncio.gather(
         _insert(),  # context session
