@@ -73,9 +73,11 @@ class DBConnect:
         """Gets the session maker"""
         if self._before_create_session_handler:
             await self._before_create_session_handler(self)
-        if not self._session_maker:
+        if self._session_maker is None:
             assert self.host
-            await self.connect(self.host)
+            async with self._lock:
+                if self._session_maker is None:
+                    await self._connect(self.host)
 
         assert self._session_maker
         return self._session_maker

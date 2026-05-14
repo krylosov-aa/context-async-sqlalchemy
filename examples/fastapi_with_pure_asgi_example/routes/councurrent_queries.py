@@ -16,7 +16,8 @@ from examples.models import ExampleTable
 
 async def concurrent_queries() -> None:
     """
-    You may need to run multiple sessions. For example, to run several queries concurrently.
+    You may need to run multiple sessions. For example, to run several queries
+        concurrently.
 
     You can also use the same techniques to create new sessions whenever you
         need them, not necessarily because of the concurrent processing.

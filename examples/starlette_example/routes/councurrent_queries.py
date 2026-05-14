@@ -17,7 +17,8 @@ from examples.models import ExampleTable
 
 async def concurrent_queries(_: Request) -> JSONResponse:
     """
-    You may need to run multiple sessions simultaneously For example, to run several queries concurrently.
+    You may need to run multiple sessions simultaneously For example, to run
+        several queries concurrently.
 
     You can also use these same techniques to create new sessions whenever you
         need them. Not necessarily just because of the concurrent processing.

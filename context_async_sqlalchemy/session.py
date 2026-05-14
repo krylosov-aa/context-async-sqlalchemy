@@ -108,7 +108,8 @@ async def close_db_session(connect: DBConnect) -> None:
     """
     Closes the active session (and connection), if there is one.
 
-    Use if you have more work you need to complete without keeping the connection open.
+    Use if you have more work you need to complete without keeping the
+        connection open.
 
     example of use:
         await your_function_with_db_session()

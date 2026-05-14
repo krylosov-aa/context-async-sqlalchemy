@@ -1,3 +1,4 @@
+import asyncio
 from contextvars import copy_context
 from typing import Any, Awaitable, Callable, TypeVar
 
@@ -32,7 +33,9 @@ async def run_in_new_ctx(
         )
     """
     new_ctx = copy_context()
-    return await new_ctx.run(_new_ctx_wrapper, callable_func, *args, **kwargs)
+    coro = _new_ctx_wrapper(callable_func, *args, **kwargs)
+    task = new_ctx.run(asyncio.ensure_future, coro)
+    return await task
 
 
 async def _new_ctx_wrapper(

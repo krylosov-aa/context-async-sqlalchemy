@@ -1,13 +1,13 @@
 [project]
 name = "context-async-sqlalchemy"
-version = "2.1.6"
+version = "2.1.7"
 description = "A convenient way to configure and work with an async SQLAlchemy session through context in asynchronous applications"
 readme = "README.md"
 authors = [
   { name="krylosov-aa", email="krylosov.andrew@gmail.com" }
 ]
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "sqlalchemy>=2.0",
 ]
