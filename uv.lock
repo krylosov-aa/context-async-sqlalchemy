@@ -395,7 +395,7 @@ wheels = [
 
 [[package]]
 name = "context-async-sqlalchemy"
-version = "2.1.7"
+version = "2.1.8"
 source = { editable = "." }
 dependencies = [
     { name = "sqlalchemy" },
