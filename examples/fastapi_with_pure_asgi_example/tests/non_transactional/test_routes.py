@@ -5,9 +5,9 @@ Data isolation between tests is performed by running trunks before and after
 This is fair testing, but slower.
 """
 
-import pytest
 from http import HTTPStatus
 
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.asyncio import AsyncSession

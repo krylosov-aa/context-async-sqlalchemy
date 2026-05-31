@@ -1,6 +1,8 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Literal
+from typing import Literal
 
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .connect import DBConnect
@@ -38,7 +40,7 @@ _current_transaction_choices = Literal[
 async def atomic_db_session(
     connect: DBConnect,
     current_transaction: _current_transaction_choices = "commit",
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """
     A context manager that you can use to wrap another function which
         uses a context session, isolating the call within its
@@ -59,11 +61,7 @@ async def atomic_db_session(
             await session.execute(...)
     """
     session = await db_session(connect)
-    if session.in_transaction():
-        if current_transaction == "commit":
-            await session.commit()
-        if current_transaction == "rollback":
-            await session.rollback()
+    await _handle_existing_transaction(session, current_transaction)
 
     if current_transaction == "append":
         try:
@@ -76,6 +74,20 @@ async def atomic_db_session(
     else:
         async with session.begin():
             yield session
+
+
+async def _handle_existing_transaction(
+    session: AsyncSession,
+    current_transaction: _current_transaction_choices,
+) -> None:
+    if not session.in_transaction():
+        return
+    if current_transaction == "commit":
+        await session.commit()
+    elif current_transaction == "rollback":
+        await session.rollback()
+    elif current_transaction == "raise":
+        raise InvalidRequestError("Session already has an open transaction")
 
 
 async def commit_db_session(connect: DBConnect) -> None:
@@ -123,7 +135,7 @@ async def close_db_session(connect: DBConnect) -> None:
 @asynccontextmanager
 async def new_non_ctx_session(
     connect: DBConnect,
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """
     Creating a new session without using a context
 
@@ -139,7 +151,7 @@ async def new_non_ctx_session(
 @asynccontextmanager
 async def new_non_ctx_atomic_session(
     connect: DBConnect,
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """
     Creating a new session with transaction without using a context
 
@@ -147,6 +159,5 @@ async def new_non_ctx_atomic_session(
         async with new_non_ctx_atomic_session(connect) as session:
             await session.execute(...)
     """
-    async with new_non_ctx_session(connect) as session:
-        async with session.begin():
-            yield session
+    async with new_non_ctx_session(connect) as session, session.begin():
+        yield session

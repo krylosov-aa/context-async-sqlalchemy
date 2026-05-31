@@ -109,7 +109,7 @@ There are two problems here:
 1. You can’t close the session or transaction prematurely, because the
 dependency is responsible for that.
 2. The session has to be passed all the way down the stack to the place where
-it’s actually needed.
+it's actually needed.
 
 
 By the way, there’s no ready-made solution for integrating with the framework
@@ -173,4 +173,4 @@ And this library solves all of these issues:
 - Automatic management of engine, session, and transaction lifecycles
 - Manually close a session at any time without waiting for the
 end of process
-- Access a session from the context only where it’s actually needed
+- Access a session from the context only where it's actually needed

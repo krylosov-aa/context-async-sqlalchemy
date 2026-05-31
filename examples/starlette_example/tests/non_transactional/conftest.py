@@ -5,12 +5,12 @@ Data isolation between tests is performed by running trunks before and after
 This is fair testing, but slower.
 """
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest_asyncio
-from starlette.applications import Starlette
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from starlette.applications import Starlette
 
 from examples.database import (
     connection,
@@ -22,7 +22,7 @@ from examples.database import (
 @pytest_asyncio.fixture(autouse=True)
 async def cleanup_tables_after(
     app: Starlette,  # To make the connection to the database in lifespan
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """
     After each test, we delete all data from the tables to isolate the data.
     We always clear the data after each test to avoid interfering with

@@ -8,7 +8,7 @@ Data isolation is achieved by clearing all tables at the end of each test
 
 
 We can verify how it handles sessions and transactions on its own.
-It’s also convenient to inspect the database state when a test is paused.
+it's also convenient to inspect the database state when a test is paused.
 
 Sometimes, there are complex session management scenarios (for example,
 concurrent query execution) where other types of testing are either

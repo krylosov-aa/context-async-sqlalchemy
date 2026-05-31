@@ -15,6 +15,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "asyncpg>=0.30.0",
+    "complexipy>=5.5.0",
     "fastapi>=0.121.1",
     "greenlet>=3.2.4",
     "httpx>=0.28.1",
@@ -26,6 +27,7 @@ dev = [
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
+    "radon>=6.0.1",
     "ruff>=0.14.4",
     "wemake-python-styleguide>=0.19.2",
 ]
@@ -39,3 +41,64 @@ packages = ["context_async_sqlalchemy"]
 
 [project.urls]
 Homepage = "https://github.com/krylosov-aa/context-async-sqlalchemy"
+
+[tool.complexipy]
+max-complexity-allowed = 10
+exclude-patterns = [
+    ".venv",
+    "venv",
+    "__pycache__",
+]
+
+
+[tool.ruff]
+line-length = 79
+target-version = "py310"
+exclude = [
+    ".venv",
+    "venv",
+    "__pycache__",
+    "migrations",
+    "build",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors: PEP 8 style errors
+    "F",      # Pyflakes: detects undefined names, unused imports, and other logical issues
+    "I",      # isort: import sorting and formatting
+    "B",      # flake8-bugbear: likely bugs and design problems
+    "UP",     # pyupgrade: modernize syntax for newer Python versions
+    "SIM",    # flake8-simplify: simplify code constructs
+    "C901",   # mccabe: function/method complexity checks
+    "S",      # flake8-bandit: security checks
+    "ASYNC",  # flake8-async: async/await best practices
+    "T10",    # flake8-debugger: no breakpoint/pdb
+    "T20",    # flake8-print: no print() in production
+    "PERF",   # Perflint: performance anti-patterns
+    "RUF",    # Ruff-specific rules
+    "DTZ",    # flake8-datetimez: timezone-aware datetime
+    "TCH",    # flake8-type-checking: TYPE_CHECKING imports
+    "C4",     # flake8-comprehensions: comprehension improvements
+]
+
+
+[tool.ruff.lint.per-file-ignores]
+"{examples,tests}/**" = [
+    "S101",   # assert is standard in pytest
+    "T20",    # print() allowed in tests
+    "S105",   # mock/test credential strings are not real passwords
+    "DTZ005", # datetime.now() without tz is fine in tests
+    "DTZ011", # date.today() without tz is fine in tests
+    "PERF",   # performance rules not applied to test code
+    "RUF028", # fmt: off inside function calls used in legacy test fixtures
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.radon]
+exclude = "venv/*,.venv/*"
+cc_min = "C"
+show_complexity = true
+average = true

@@ -198,7 +198,7 @@ async def create_cat(name, session=Depends(get_atomic_session)):
 <li>You can’t close the session or transaction prematurely, because the
 dependency is responsible for that.</li>
 <li>The session has to be passed all the way down the stack to the place where
-it’s actually needed.</li>
+it's actually needed.</li>
 </ol>
 <p>By the way, there’s no ready-made solution for integrating with the framework
 - you have to implement the dependency yourself.</p>
@@ -248,7 +248,7 @@ challenging.</p>
 <li>Automatic management of engine, session, and transaction lifecycles</li>
 <li>Manually close a session at any time without waiting for the
 end of process</li>
-<li>Access a session from the context only where it’s actually needed</li>
+<li>Access a session from the context only where it's actually needed</li>
 </ul>
               
             </div>

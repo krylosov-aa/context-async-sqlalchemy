@@ -1,7 +1,7 @@
-from starlette.requests import Request
-from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
+from starlette.requests import Request
 
+from context_async_sqlalchemy import db_session
 from examples.database import connection
 from examples.models import ExampleTable
 

@@ -1,5 +1,7 @@
 import asyncio
 
+from sqlalchemy import insert
+
 from context_async_sqlalchemy import (
     close_db_session,
     commit_db_session,
@@ -8,8 +10,6 @@ from context_async_sqlalchemy import (
     new_non_ctx_session,
     run_in_new_ctx,
 )
-from sqlalchemy import insert
-
 from examples.database import connection
 from examples.models import ExampleTable
 

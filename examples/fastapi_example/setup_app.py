@@ -1,13 +1,14 @@
 """Setting up the application"""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
+
 from fastapi import FastAPI
 
 from context_async_sqlalchemy.fastapi_utils import (
     add_fastapi_http_db_session_middleware,
 )
-
 from examples.database import connection
 
 from .routes.atomic import atomic_base_example

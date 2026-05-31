@@ -184,12 +184,12 @@ It will be used to connect to the host for the first time or to reconnect to a n
 ) -&gt; None:
 </code></pre>
 <p><code>engine_creator</code> is a factory function for creating engines.
-It’s an asynchronous callable that takes a host as input and returns
+it's an asynchronous callable that takes a host as input and returns
 an async engine.</p>
 <p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/database.py#L15">Example</a></p>
 <p><code>session_maker_creator</code> is a factory function for creating an asynchronous
 session_maker.
-It’s an asynchronous callable that takes an async engine as input and returns
+it's an asynchronous callable that takes an async engine as input and returns
 an async session_maker.</p>
 <p><a href="https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/database.py#L35">Example</a></p>
 <p><code>host</code> is an optional parameter.
@@ -238,7 +238,7 @@ from the target host.</p>
 <pre><code class="language-python">async def close(self: DBConnect) -&gt; None:
 </code></pre>
 <p>Closes and cleans up all resources, freeing the connection pool.
-Use this call at the end of your application’s life cycle.</p>
+Use this call at the end of your application's life cycle.</p>
 <h2 id="middlewares">Middlewares</h2>
 <p>Most of the work the “magic” happens inside the middleware. Check out
 <a href="../how_middleware_works/">how it works</a> and implement your own if the ready-made ones don't fit.</p>
@@ -390,7 +390,7 @@ async def set_test_context(auto_close: bool = False) -&gt; AsyncGenerator[None, 
 <p>A context manager that creates a new context in which you can place a
 dedicated test session.
 It is intended to test the application when it shares a single transaction.</p>
-<p>Use <code>auto_close=False</code> if you’re using a test session and transaction
+<p>Use <code>auto_close=False</code> if you're using a test session and transaction
 that you close elsewhere in your code.</p>
 <p>Use <code>auto_close=True</code> to call a function
 in a test that uses a context while the middleware is not

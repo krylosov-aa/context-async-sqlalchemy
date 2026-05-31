@@ -2,17 +2,18 @@
 Basic settings and fixtures for testing
 """
 
-from typing import AsyncGenerator
-from starlette.applications import Starlette
+from collections.abc import AsyncGenerator
 
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy import func, Result, select
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import Result, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.applications import Starlette
 
 from context_async_sqlalchemy.test_utils import rollback_session
 from examples.database import connection
 from examples.models import ExampleTable
+
 from ..setup_app import lifespan, setup_app
 
 
@@ -28,7 +29,7 @@ async def app() -> AsyncGenerator[Starlette]:
 
 
 @pytest_asyncio.fixture
-async def client(app: Starlette) -> AsyncGenerator[AsyncClient, None]:
+async def client(app: Starlette) -> AsyncGenerator[AsyncClient]:
     """Client for calling application handlers"""
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
@@ -37,7 +38,7 @@ async def client(app: Starlette) -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest_asyncio.fixture
-async def db_session_test() -> AsyncGenerator[AsyncSession, None]:
+async def db_session_test() -> AsyncGenerator[AsyncSession]:
     """The session that is used inside the test"""
     async with rollback_session(connection) as session:
         yield session

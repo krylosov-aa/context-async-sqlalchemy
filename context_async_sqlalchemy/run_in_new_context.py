@@ -1,10 +1,10 @@
 import asyncio
+from collections.abc import Awaitable, Callable
 from contextvars import copy_context
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any, TypeVar
 
-from .context import init_db_session_ctx, reset_db_session_ctx
 from .auto_commit import commit_all_sessions, rollback_all_sessions
-
+from .context import init_db_session_ctx, reset_db_session_ctx
 
 AsyncCallableResult = TypeVar("AsyncCallableResult")
 AsyncCallable = Callable[..., Awaitable[AsyncCallableResult]]

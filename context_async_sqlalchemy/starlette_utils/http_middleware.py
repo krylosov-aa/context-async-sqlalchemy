@@ -1,17 +1,16 @@
 from starlette.applications import Starlette
-from starlette.middleware.base import (  # type: ignore[attr-defined]
-    Request,
-    Response,
-    RequestResponseEndpoint,
+from starlette.middleware.base import (
     BaseHTTPMiddleware,
+    RequestResponseEndpoint,
 )
+from starlette.requests import Request
+from starlette.responses import Response
 
-from context_async_sqlalchemy import (
+from ..auto_commit import auto_commit_by_status_code, rollback_all_sessions
+from ..context import (
     init_db_session_ctx,
     is_context_initiated,
     reset_db_session_ctx,
-    auto_commit_by_status_code,
-    rollback_all_sessions,
 )
 
 

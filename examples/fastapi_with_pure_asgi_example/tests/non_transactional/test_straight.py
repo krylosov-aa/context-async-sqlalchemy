@@ -6,8 +6,8 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from context_async_sqlalchemy.test_utils import set_test_context
-
 from examples.fastapi_example.routes.atomic import atomic_base_example
+
 from ..conftest import count_rows_example_table
 
 

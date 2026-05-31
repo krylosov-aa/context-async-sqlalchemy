@@ -1,8 +1,16 @@
+l:
+	make lint
+
 lint:
 	ruff format .
 	mypy .
 	ruff check --fix .
 	flake8 .
+	complexipy . --failed
+	radon cc .
+
+t:
+	make test
 
 test:
 	pytest --cov context_async_sqlalchemy tests examples/fastapi_example/tests examples/starlette_example/tests examples/fastapi_with_pure_asgi_example/tests --cov-report=term-missing

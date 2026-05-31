@@ -1,8 +1,8 @@
+from sqlalchemy import insert
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from context_async_sqlalchemy import db_session, rollback_db_session
-from sqlalchemy import insert
 
+from context_async_sqlalchemy import db_session, rollback_db_session
 from examples.database import connection
 from examples.models import ExampleTable
 

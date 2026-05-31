@@ -1,9 +1,17 @@
+from collections.abc import Generator
 from contextvars import ContextVar, Token
-from typing import Any, Generator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .connect import DBConnect
+
+
+class ContextAlreadyInitiatedError(Exception):
+    """Context already initiated"""
+
+
+class ContextNotInitiatedError(Exception):
+    """Context is not initiated"""
 
 
 def init_db_session_ctx(
@@ -13,7 +21,7 @@ def init_db_session_ctx(
     Initiates a context for storing sessions
     """
     if not force and is_context_initiated():
-        raise Exception("Context already initiated")
+        raise ContextAlreadyInitiatedError("Context already initiated")
 
     return _init_db_session_ctx()
 
@@ -69,10 +77,9 @@ def put_db_session_to_context(
     session_ctx[connection.context_key] = session
 
 
-def sessions_stream() -> Generator[AsyncSession, Any, None]:
+def sessions_stream() -> Generator[AsyncSession, None, None]:
     """Read all open context sessions"""
-    for session in _get_initiated_context().values():
-        yield session
+    yield from _get_initiated_context().values()
 
 
 _db_session_ctx: ContextVar[dict[str, AsyncSession] | None] = ContextVar(
@@ -83,7 +90,7 @@ _db_session_ctx: ContextVar[dict[str, AsyncSession] | None] = ContextVar(
 def _get_initiated_context() -> dict[str, AsyncSession]:
     session_ctx = _db_session_ctx.get()
     if session_ctx is None:
-        raise Exception("Context is not initiated")
+        raise ContextNotInitiatedError("Context is not initiated")
     return session_ctx
 
 

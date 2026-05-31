@@ -1,8 +1,9 @@
-from fastapi import HTTPException
+from http import HTTPStatus
 
-from context_async_sqlalchemy import db_session
+from fastapi import HTTPException
 from sqlalchemy import insert
 
+from context_async_sqlalchemy import db_session
 from examples.database import connection
 from examples.models import ExampleTable
 
@@ -15,5 +16,5 @@ async def auto_rollback_by_status_code() -> None:
     stmt = insert(ExampleTable).values(text="example_with_db_session")
     await session.execute(stmt)
 
-    raise HTTPException(status_code=500)
+    raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
     # transaction rolls back automatically by status code

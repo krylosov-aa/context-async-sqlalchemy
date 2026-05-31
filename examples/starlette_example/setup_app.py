@@ -1,7 +1,8 @@
 """Setting up the application"""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
 
 from starlette.applications import Starlette
 from starlette.routing import Route
@@ -9,8 +10,8 @@ from starlette.routing import Route
 from context_async_sqlalchemy.starlette_utils import (
     add_starlette_http_db_session_middleware,
 )
-
 from examples.database import connection
+
 from .routes.atomic import atomic_base_example
 from .routes.atomic_prev_transaction import atomic_and_previous_transaction
 from .routes.auto_rollback_by_exception import auto_rollback_by_exception

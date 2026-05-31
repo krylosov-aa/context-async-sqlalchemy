@@ -1,13 +1,14 @@
 import uuid
 from typing import Any
+
 from pydantic import GetCoreSchemaHandler
 from pydantic_core.core_schema import IsInstanceSchema, is_instance_schema
-from sqlalchemy import text, UUID, Text
+from sqlalchemy import UUID, Text, text
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
-    mapped_column,
     MappedColumn,
+    mapped_column,
 )
 
 

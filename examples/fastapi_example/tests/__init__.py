@@ -1,6 +1,6 @@
 """
 An example of integration tests.
-I recommend this approach because it’s independent of the application’s
+I recommend this approach because it's independent of the application's
     architecture and allows you to test your application in a realistic way.
 
 When testing with a real database, one important problem needs to be

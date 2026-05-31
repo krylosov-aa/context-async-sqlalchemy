@@ -10,7 +10,7 @@ But for most basic tests, it's sufficient.
 On the plus side, these tests run faster.
 """
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,12 +25,14 @@ from examples.database import connection
 @pytest_asyncio.fixture(autouse=True)
 async def db_session_override(
     db_session_test: AsyncSession,
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """
     The key thing about these tests is that we override the context in advance.
     The middleware has a special check that won't initialize the context
         if it already exists.
     """
-    async with set_test_context():
-        async with put_savepoint_session_in_ctx(connection, db_session_test):
-            yield
+    async with (
+        set_test_context(),
+        put_savepoint_session_in_ctx(connection, db_session_test),
+    ):
+        yield

@@ -1,11 +1,12 @@
 import asyncio
-from typing import Any, Callable, Coroutine
+from collections.abc import Callable, Coroutine
+from typing import Any
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import (
-    async_sessionmaker,
     AsyncEngine,
     AsyncSession,
+    async_sessionmaker,
 )
 
 EngineCreatorFunc = Callable[[str], AsyncEngine]
@@ -53,13 +54,15 @@ class DBConnect:
 
     async def connect(self, host: str) -> None:
         """initiates engine and session maker"""
-        assert host
+        if not host:
+            raise ValueError("host must not be empty")
         async with self._lock:
             await self._connect(host)
 
     async def change_host(self, host: str) -> None:
         """Renews the connection if a host needs to be changed"""
-        assert host
+        if not host:
+            raise ValueError("host must not be empty")
         async with self._lock:
             if host != self.host:
                 await self._connect(host)
@@ -74,12 +77,14 @@ class DBConnect:
         if self._before_create_session_handler:
             await self._before_create_session_handler(self)
         if self._session_maker is None:
-            assert self.host
+            if not self.host:
+                raise ValueError("host is not set")
             async with self._lock:
                 if self._session_maker is None:
                     await self._connect(self.host)
 
-        assert self._session_maker
+        if self._session_maker is None:
+            raise RuntimeError("session_maker failed to initialize")
         return self._session_maker
 
     async def close(self) -> None:

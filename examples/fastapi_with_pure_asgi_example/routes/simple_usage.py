@@ -1,7 +1,6 @@
 from sqlalchemy import insert
 
 from context_async_sqlalchemy import db_session
-
 from examples.database import connection
 from examples.models import ExampleTable
 

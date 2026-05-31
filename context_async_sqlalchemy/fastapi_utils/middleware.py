@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from starlette.middleware.base import (  # type: ignore[attr-defined]
-    Request,
-    Response,
+from starlette.middleware.base import (
     RequestResponseEndpoint,
 )
+from starlette.requests import Request
+from starlette.responses import Response
 
 from context_async_sqlalchemy.starlette_utils import (
     add_starlette_http_db_session_middleware,

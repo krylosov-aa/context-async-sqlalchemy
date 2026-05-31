@@ -1,12 +1,12 @@
+from sqlalchemy import insert
 from starlette.requests import Request
 from starlette.responses import JSONResponse
+
 from context_async_sqlalchemy import (
     atomic_db_session,
     close_db_session,
     db_session,
 )
-from sqlalchemy import insert
-
 from examples.database import connection
 from examples.models import ExampleTable
 

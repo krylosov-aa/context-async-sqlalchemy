@@ -74,7 +74,9 @@ async def db_session_override(
     The middleware has a special check that won't initialize the context
         if it already exists.
     """
-    async with set_test_context():
-        async with put_savepoint_session_in_ctx(connection, db_session_test):
-            yield
+    async with (
+        set_test_context(),
+        put_savepoint_session_in_ctx(connection, db_session_test),
+    ):
+        yield
 ```

@@ -1,9 +1,8 @@
+from sqlalchemy import insert
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from sqlalchemy import insert
 
 from context_async_sqlalchemy import db_session
-
 from examples.database import connection
 from examples.models import ExampleTable
 
@@ -20,11 +19,8 @@ async def simple_usage(_: Request) -> JSONResponse:
     # even in child coroutines.
     session = await db_session(connection)
 
-    stmt = insert(ExampleTable)
-
     # On the first request, a connection and transaction were opened
-    await session.execute(stmt)
+    await session.execute(insert(ExampleTable))
 
     return JSONResponse({})
-
     # Commit will happen automatically

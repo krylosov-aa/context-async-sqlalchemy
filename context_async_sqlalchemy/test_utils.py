@@ -1,13 +1,13 @@
 """Utilities to use during testing"""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from context_async_sqlalchemy import (
-    commit_all_sessions,
-    DBConnect,
+from .auto_commit import commit_all_sessions, rollback_all_sessions
+from .connect import DBConnect
+from .context import (
     init_db_session_ctx,
     put_db_session_to_context,
     reset_db_session_ctx,
@@ -17,7 +17,7 @@ from context_async_sqlalchemy import (
 @asynccontextmanager
 async def rollback_session(
     connection: DBConnect,
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """A session that always rolls back"""
     session_maker = await connection.session_maker()
     async with session_maker() as session:
@@ -30,11 +30,11 @@ async def rollback_session(
 @asynccontextmanager
 async def set_test_context(
     auto_close: bool = False,
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """
     Opens a context similar to middleware.
 
-    Use auto_close=False if you’re using a test session and transaction
+    Use auto_close=False if you're using a test session and transaction
         that you close elsewhere in your code.
 
     Use auto_close=True if you want to call a function
@@ -44,9 +44,14 @@ async def set_test_context(
     token = init_db_session_ctx()
     try:
         yield
-    finally:
+    except Exception:
+        if auto_close:
+            await rollback_all_sessions()
+        raise
+    else:
         if auto_close:
             await commit_all_sessions()
+    finally:
         await reset_db_session_ctx(
             token,
             # Don't close the session here if you opened in fixture.
@@ -58,7 +63,7 @@ async def set_test_context(
 async def put_savepoint_session_in_ctx(
     connection: DBConnect,
     session: AsyncSession,
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     """
     Sets the context to a session that uses a save point instead of creating
         a transaction. You need to pass the session you're using inside
@@ -74,4 +79,4 @@ async def put_savepoint_session_in_ctx(
         join_transaction_mode="create_savepoint",
     ) as session:
         put_db_session_to_context(connection, session)
-    yield
+        yield

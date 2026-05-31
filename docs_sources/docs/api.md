@@ -22,7 +22,7 @@ def __init__(
 ```
 
 `engine_creator` is a factory function for creating engines.
-It’s an asynchronous callable that takes a host as input and returns
+it's an asynchronous callable that takes a host as input and returns
 an async engine.
 
 [Example](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/database.py#L15)
@@ -30,7 +30,7 @@ an async engine.
 
 `session_maker_creator` is a factory function for creating an asynchronous
 session_maker.
-It’s an asynchronous callable that takes an async engine as input and returns
+it's an asynchronous callable that takes an async engine as input and returns
 an async session_maker.
 
 [Example](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/database.py#L35)
@@ -106,7 +106,7 @@ Provides access to the `session_maker` currently used to create sessions.
 async def close(self: DBConnect) -> None:
 ```
 Closes and cleans up all resources, freeing the connection pool.
-Use this call at the end of your application’s life cycle.
+Use this call at the end of your application's life cycle.
 
 
 
@@ -313,7 +313,7 @@ A context manager that creates a new context in which you can place a
 dedicated test session.
 It is intended to test the application when it shares a single transaction.
 
-Use `auto_close=False` if you’re using a test session and transaction
+Use `auto_close=False` if you're using a test session and transaction
 that you close elsewhere in your code.
 
 Use `auto_close=True` to call a function

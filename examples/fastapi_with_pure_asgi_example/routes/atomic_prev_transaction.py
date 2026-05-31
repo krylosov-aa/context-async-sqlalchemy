@@ -1,6 +1,6 @@
-from context_async_sqlalchemy import atomic_db_session, db_session
 from sqlalchemy import insert
 
+from context_async_sqlalchemy import atomic_db_session, db_session
 from examples.database import connection
 from examples.models import ExampleTable
 
