@@ -56,7 +56,8 @@ async def cleanup_tables_before() -> None:
     It has its own engine, since the scope is session.
     """
     # Since the scope is different, we make a separate engine
-    engine = create_engine("127.0.0.1")
+    assert connection.host is not None
+    engine = create_engine(connection.host)
     session_maker = create_session_maker(engine)
     await _cleanup_tables(session_maker)
     await engine.dispose()

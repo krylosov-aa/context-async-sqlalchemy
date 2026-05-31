@@ -97,6 +97,10 @@ select = [
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests", "examples"]
+
 [tool.radon]
 exclude = "venv/*,.venv/*"
 cc_min = "C"
