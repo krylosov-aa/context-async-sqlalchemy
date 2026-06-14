@@ -290,7 +290,7 @@ always see the data that was just written — even when reads are served by a re
 The implementation uses the PostgreSQL WAL LSN (Log Sequence Number).
 After a write transaction the current LSN is captured via `before_commit` and sent to the client
 as a cookie.
-On the next read the client echoes the cookie back, and The application can use LSN
+On the next read the client echoes the cookie back, and the application can use LSN
 to select which replica to send a request to (the one that has already caught up) or
 send it to the master if no replica has caught up yet.
 
@@ -366,7 +366,7 @@ app.add_middleware(BaseHTTPMiddleware, dispatch=lsn_cookie_middleware)
 ```
 
 The full, runnable implementation is available in
-[examples/fastapi_example/read_own_writes.py](../../examples/fastapi_example/read_own_writes.py).
+[examples/fastapi_example/read_own_writes.py](https://github.com/krylosov-aa/context-async-sqlalchemy/blob/main/examples/fastapi_example/read_own_writes.py).
 
 **Step 4 — route reads to the right replica**
 
