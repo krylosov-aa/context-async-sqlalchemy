@@ -61,12 +61,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#manually-close-the-transaction-and-session">Manually close the transaction and session</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#multiple-sessions-and-concurrent-execution">Multiple sessions and concurrent execution</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#read-your-own-writes">Read Your Own Writes</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#rollback">Rollback</a>
+    <li class="toctree-l2"><a class="reference internal" href="#rollback">Rollback</a>
     </li>
-        </ul>
+    <li class="toctree-l2"><a class="reference internal" href="#read-your-own-writes">Read Your Own Writes</a>
     </li>
     </ul>
                 </li>
@@ -238,7 +236,7 @@ async def _insert_3() -&gt; None:
     )
     await session.execute(stmt)
 </code></pre>
-<h2 id="multiple-sessions-and-concurrent-execution">Multiple sessions and concurrent execution</h2>
+<h3 id="multiple-sessions-and-concurrent-execution">Multiple sessions and concurrent execution</h3>
 <pre><code class="language-python">import asyncio
 
 from context_async_sqlalchemy import (
@@ -308,6 +306,73 @@ async def _insert_non_ctx_manual() -&gt; None:
         stmt = insert(ExampleTable).values(text=&quot;example_multiple_sessions&quot;)
         await session.execute(stmt)
         await session.commit()
+</code></pre>
+<h3 id="rollback">Rollback</h3>
+<pre><code class="language-python">from context_async_sqlalchemy import db_session
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_with_db_session_and_exception() -&gt; None:
+    &quot;&quot;&quot;
+    let's imagine that an exception occurred.
+    &quot;&quot;&quot;
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(text=&quot;example_with_db_session&quot;)
+    await session.execute(stmt)
+
+    raise Exception(&quot;Some exception&quot;)
+    # transaction automatically rolls back
+</code></pre>
+<pre><code class="language-python">from fastapi import HTTPException
+
+from context_async_sqlalchemy import db_session
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_with_db_session_and_http_exception() -&gt; None:
+    &quot;&quot;&quot;
+    let's imagine that an http exception occurred.
+    &quot;&quot;&quot;
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(text=&quot;example_with_db_session&quot;)
+    await session.execute(stmt)
+
+    raise HTTPException(status_code=500)
+    # transaction rolls back automatically by status code
+</code></pre>
+<pre><code class="language-python">from context_async_sqlalchemy import db_session, rollback_db_session
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_with_db_session_and_manual_rollback() -&gt; None:
+    &quot;&quot;&quot;
+    An example of a handle that uses a rollback
+    &quot;&quot;&quot;
+    # it's convenient this way
+    await _insert()
+    await rollback_db_session(connection)
+
+    # but it's possible this way too
+    await _insert()
+    session = await db_session(connection)
+    await session.rollback()
+
+
+async def _insert() -&gt; None:
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(
+        text=&quot;example_with_db_session_and_manual_close&quot;
+    )
+    await session.execute(stmt)
 </code></pre>
 <h3 id="read-your-own-writes">Read Your Own Writes</h3>
 <p>The "Read Your Own Writes" pattern ensures that after a write request, subsequent read requests
@@ -389,74 +454,6 @@ it against the client-supplied LSN.</p>
 <p>The <a href="https://github.com/krylosov-aa/pg-status">pg-status</a> provides a ready-made helper
 for exactly this: it lets you poll replicas and pick the first one whose replay LSN is at or
 ahead of the required value, falling back to the primary if none qualifies.</p>
-<hr />
-<h3 id="rollback">Rollback</h3>
-<pre><code class="language-python">from context_async_sqlalchemy import db_session
-from sqlalchemy import insert
-
-from ..database import connection
-from ..models import ExampleTable
-
-
-async def handler_with_db_session_and_exception() -&gt; None:
-    &quot;&quot;&quot;
-    let's imagine that an exception occurred.
-    &quot;&quot;&quot;
-    session = await db_session(connection)
-    stmt = insert(ExampleTable).values(text=&quot;example_with_db_session&quot;)
-    await session.execute(stmt)
-
-    raise Exception(&quot;Some exception&quot;)
-    # transaction automatically rolls back
-</code></pre>
-<pre><code class="language-python">from fastapi import HTTPException
-
-from context_async_sqlalchemy import db_session
-from sqlalchemy import insert
-
-from ..database import connection
-from ..models import ExampleTable
-
-
-async def handler_with_db_session_and_http_exception() -&gt; None:
-    &quot;&quot;&quot;
-    let's imagine that an http exception occurred.
-    &quot;&quot;&quot;
-    session = await db_session(connection)
-    stmt = insert(ExampleTable).values(text=&quot;example_with_db_session&quot;)
-    await session.execute(stmt)
-
-    raise HTTPException(status_code=500)
-    # transaction rolls back automatically by status code
-</code></pre>
-<pre><code class="language-python">from context_async_sqlalchemy import db_session, rollback_db_session
-from sqlalchemy import insert
-
-from ..database import connection
-from ..models import ExampleTable
-
-
-async def handler_with_db_session_and_manual_rollback() -&gt; None:
-    &quot;&quot;&quot;
-    An example of a handle that uses a rollback
-    &quot;&quot;&quot;
-    # it's convenient this way
-    await _insert()
-    await rollback_db_session(connection)
-
-    # but it's possible this way too
-    await _insert()
-    session = await db_session(connection)
-    await session.rollback()
-
-
-async def _insert() -&gt; None:
-    session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text=&quot;example_with_db_session_and_manual_close&quot;
-    )
-    await session.execute(stmt)
-</code></pre>
               
             </div>
           </div><footer>

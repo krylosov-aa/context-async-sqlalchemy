@@ -134,7 +134,7 @@ async def _insert_3() -> None:
     await session.execute(stmt)
 ```
 
-## Multiple sessions and concurrent execution
+### Multiple sessions and concurrent execution
 
 ```python
 import asyncio
@@ -206,6 +206,80 @@ async def _insert_non_ctx_manual() -> None:
         stmt = insert(ExampleTable).values(text="example_multiple_sessions")
         await session.execute(stmt)
         await session.commit()
+```
+
+### Rollback
+
+```python
+from context_async_sqlalchemy import db_session
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_with_db_session_and_exception() -> None:
+    """
+    let's imagine that an exception occurred.
+    """
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(text="example_with_db_session")
+    await session.execute(stmt)
+
+    raise Exception("Some exception")
+    # transaction automatically rolls back
+```
+
+```python
+from fastapi import HTTPException
+
+from context_async_sqlalchemy import db_session
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_with_db_session_and_http_exception() -> None:
+    """
+    let's imagine that an http exception occurred.
+    """
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(text="example_with_db_session")
+    await session.execute(stmt)
+
+    raise HTTPException(status_code=500)
+    # transaction rolls back automatically by status code
+```
+
+```python
+from context_async_sqlalchemy import db_session, rollback_db_session
+from sqlalchemy import insert
+
+from ..database import connection
+from ..models import ExampleTable
+
+
+async def handler_with_db_session_and_manual_rollback() -> None:
+    """
+    An example of a handle that uses a rollback
+    """
+    # it's convenient this way
+    await _insert()
+    await rollback_db_session(connection)
+
+    # but it's possible this way too
+    await _insert()
+    session = await db_session(connection)
+    await session.rollback()
+
+
+async def _insert() -> None:
+    session = await db_session(connection)
+    stmt = insert(ExampleTable).values(
+        text="example_with_db_session_and_manual_close"
+    )
+    await session.execute(stmt)
 ```
 
 ### Read Your Own Writes
@@ -303,79 +377,3 @@ it against the client-supplied LSN.
 The [pg-status](https://github.com/krylosov-aa/pg-status) provides a ready-made helper
 for exactly this: it lets you poll replicas and pick the first one whose replay LSN is at or
 ahead of the required value, falling back to the primary if none qualifies.
-
----
-
-### Rollback
-
-```python
-from context_async_sqlalchemy import db_session
-from sqlalchemy import insert
-
-from ..database import connection
-from ..models import ExampleTable
-
-
-async def handler_with_db_session_and_exception() -> None:
-    """
-    let's imagine that an exception occurred.
-    """
-    session = await db_session(connection)
-    stmt = insert(ExampleTable).values(text="example_with_db_session")
-    await session.execute(stmt)
-
-    raise Exception("Some exception")
-    # transaction automatically rolls back
-```
-
-```python
-from fastapi import HTTPException
-
-from context_async_sqlalchemy import db_session
-from sqlalchemy import insert
-
-from ..database import connection
-from ..models import ExampleTable
-
-
-async def handler_with_db_session_and_http_exception() -> None:
-    """
-    let's imagine that an http exception occurred.
-    """
-    session = await db_session(connection)
-    stmt = insert(ExampleTable).values(text="example_with_db_session")
-    await session.execute(stmt)
-
-    raise HTTPException(status_code=500)
-    # transaction rolls back automatically by status code
-```
-
-```python
-from context_async_sqlalchemy import db_session, rollback_db_session
-from sqlalchemy import insert
-
-from ..database import connection
-from ..models import ExampleTable
-
-
-async def handler_with_db_session_and_manual_rollback() -> None:
-    """
-    An example of a handle that uses a rollback
-    """
-    # it's convenient this way
-    await _insert()
-    await rollback_db_session(connection)
-
-    # but it's possible this way too
-    await _insert()
-    session = await db_session(connection)
-    await session.rollback()
-
-
-async def _insert() -> None:
-    session = await db_session(connection)
-    stmt = insert(ExampleTable).values(
-        text="example_with_db_session_and_manual_close"
-    )
-    await session.execute(stmt)
-```
