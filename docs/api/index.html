@@ -86,6 +86,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#pure-asgi">Pure ASGI</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#before_commit-callback">before_commit callback</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#sessions">Sessions</a>
@@ -286,6 +288,22 @@ app = SomeASGIApp(...)
 
 app.add_middleware(ASGIHTTPDBSessionMiddleware)
 </code></pre>
+<h3 id="before_commit-callback"><code>before_commit</code> callback</h3>
+<p>All middlewares accept an optional <code>before_commit</code> parameter — an async callable that is invoked
+right before each session with an open transaction is committed.</p>
+<pre><code class="language-python">BeforeCommitCallback = Callable[[AsyncSession], Coroutine[Any, Any, None]]
+</code></pre>
+<p>The callback receives the <code>AsyncSession</code> that is about to be committed, so you can inspect its
+state and perform side effects such as recording audit
+data or capturing a WAL LSN.</p>
+<pre><code class="language-python">async def my_before_commit(session: AsyncSession) -&gt; None:
+    # called once per session, just before commit
+    ...
+
+add_fastapi_http_db_session_middleware(app, before_commit=my_before_commit)
+</code></pre>
+<p>The callback is <strong>not</strong> called when a session is rolled back.</p>
+<p>See the <a href="../examples/#read-your-own-writes">Read Your Own Writes</a> example for a real-world use case.</p>
 <h2 id="sessions">Sessions</h2>
 <p>Here are the library functions you will use most often.
 They allow you to work with sessions directly from your asynchronous code.</p>

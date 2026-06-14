@@ -62,6 +62,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#multiple-sessions-and-concurrent-execution">Multiple sessions and concurrent execution</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#read-your-own-writes">Read Your Own Writes</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#rollback">Rollback</a>
     </li>
         </ul>
@@ -307,6 +309,87 @@ async def _insert_non_ctx_manual() -&gt; None:
         await session.execute(stmt)
         await session.commit()
 </code></pre>
+<h3 id="read-your-own-writes">Read Your Own Writes</h3>
+<p>The "Read Your Own Writes" pattern ensures that after a write request, subsequent read requests
+always see the data that was just written — even when reads are served by a replica.</p>
+<p>The implementation uses the PostgreSQL WAL LSN (Log Sequence Number).
+After a write transaction the current LSN is captured via <code>before_commit</code> and sent to the client
+as a cookie.
+On the next read the client echoes the cookie back, and The application can use LSN
+to select which replica to send a request to (the one that has already caught up) or
+send it to the master if no replica has caught up yet.</p>
+<p><strong>Step 1 — capture the LSN in <code>before_commit</code></strong></p>
+<pre><code class="language-python">from contextvars import ContextVar
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+class _LsnHolder:
+    &quot;&quot;&quot;
+    The holder is needed so that the nested context can update the lsn value,
+        which will then be visible in the middleware context.
+    &quot;&quot;&quot;
+    value: str | None = None
+
+
+_request_lsn: ContextVar[_LsnHolder] = ContextVar(&quot;_request_lsn&quot;)
+
+
+async def save_current_lsn_if_there_writes(session: AsyncSession) -&gt; None:
+    &quot;&quot;&quot;before_commit callback: saves the WAL LSN if the session had writes.&quot;&quot;&quot;
+    # pg_current_xact_id_if_assigned() returns NULL for read-only sessions
+    result = await session.execute(
+        text(
+            &quot;SELECT pg_current_wal_lsn()::text &quot;
+            &quot;WHERE pg_current_xact_id_if_assigned() IS NOT NULL&quot;
+        )
+    )
+    lsn = result.scalar()
+    if lsn:
+        _request_lsn.get().value = lsn
+</code></pre>
+<p><strong>Step 2 — expose the LSN as a cookie via a lightweight middleware</strong></p>
+<pre><code class="language-python">from starlette.middleware.base import RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
+
+
+async def lsn_cookie_middleware(
+    request: Request, call_next: RequestResponseEndpoint
+) -&gt; Response:
+    holder = _LsnHolder()
+    _request_lsn.set(holder)
+
+    response = await call_next(request)
+    if holder.value:
+        response.headers[&quot;Set-Cookie&quot;] = (
+            f&quot;X-WAL-LSN={holder.value}; Path=/; SameSite=Lax; Secure&quot;
+        )
+    return response
+</code></pre>
+<p><strong>Step 3 — wire everything together</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
+from context_async_sqlalchemy.fastapi_utils import add_fastapi_http_db_session_middleware
+
+app = FastAPI(...)
+
+add_fastapi_http_db_session_middleware(
+    app,
+    before_commit=save_current_lsn_if_there_writes,
+)
+app.add_middleware(BaseHTTPMiddleware, dispatch=lsn_cookie_middleware)
+</code></pre>
+<p>The full, runnable implementation is available in
+<a href="../../examples/fastapi_example/read_own_writes.py">examples/fastapi_example/read_own_writes.py</a>.</p>
+<p><strong>Step 4 — route reads to the right replica</strong></p>
+<p>This example does not cover how to select a replica that has already caught up to the LSN from
+the cookie. To do that you need to query each replica's current WAL replay position and compare
+it against the client-supplied LSN.</p>
+<p>The <a href="https://github.com/krylosov-aa/pg-status">pg-status</a> provides a ready-made helper
+for exactly this: it lets you poll replicas and pick the first one whose replay LSN is at or
+ahead of the required value, falling back to the primary if none qualifies.</p>
+<hr />
 <h3 id="rollback">Rollback</h3>
 <pre><code class="language-python">from context_async_sqlalchemy import db_session
 from sqlalchemy import insert
