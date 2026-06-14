@@ -36,6 +36,8 @@ async def test_simple_usage(
     assert response.status_code == HTTPStatus.OK
     assert await count_rows_example_table(db_session_test) == 1
 
+    assert response.cookies["X-WAL-LSN"]
+
 
 @pytest.mark.asyncio
 async def test_atomic_and_previous_transaction(

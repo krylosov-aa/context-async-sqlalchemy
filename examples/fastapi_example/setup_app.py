@@ -5,12 +5,17 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from context_async_sqlalchemy.fastapi_utils import (
     add_fastapi_http_db_session_middleware,
 )
 from examples.database import connection
 
+from .read_own_writes import (
+    lsn_cookie_middleware,
+    save_current_lsn_if_there_writes,
+)
 from .routes.atomic import atomic_base_example
 from .routes.atomic_prev_transaction import atomic_and_previous_transaction
 from .routes.auto_rollback_by_exception import auto_rollback_by_exception
@@ -32,7 +37,11 @@ def setup_app() -> FastAPI:
     app = FastAPI(
         lifespan=lifespan,
     )
-    add_fastapi_http_db_session_middleware(app)
+    add_fastapi_http_db_session_middleware(
+        app,
+        before_commit=save_current_lsn_if_there_writes,
+    )
+    app.add_middleware(BaseHTTPMiddleware, dispatch=lsn_cookie_middleware)
     setup_routes(app)
     return app
 

@@ -167,6 +167,31 @@ app = SomeASGIApp(...)
 app.add_middleware(ASGIHTTPDBSessionMiddleware)
 ```
 
+### `before_commit` callback
+
+All middlewares accept an optional `before_commit` parameter — an async callable that is invoked
+right before each session with an open transaction is committed.
+
+```python
+BeforeCommitCallback = Callable[[AsyncSession], Coroutine[Any, Any, None]]
+```
+
+The callback receives the `AsyncSession` that is about to be committed, so you can inspect its
+state and perform side effects such as recording audit
+data or capturing a WAL LSN.
+
+```python
+async def my_before_commit(session: AsyncSession) -> None:
+    # called once per session, just before commit
+    ...
+
+add_fastapi_http_db_session_middleware(app, before_commit=my_before_commit)
+```
+
+The callback is **not** called when a session is rolled back.
+
+See the [Read Your Own Writes](examples.md#read-your-own-writes) example for a real-world use case.
+
 
 ## Sessions
 

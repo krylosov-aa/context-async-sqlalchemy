@@ -1,3 +1,7 @@
+lt:
+	make l
+	make t
+
 l:
 	make lint
 

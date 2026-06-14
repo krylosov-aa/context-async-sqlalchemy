@@ -5,19 +5,30 @@ from starlette.middleware.base import (
 from starlette.requests import Request
 from starlette.responses import Response
 
-from context_async_sqlalchemy.starlette_utils import (
+from ..auto_commit import (
+    BeforeCommitCallback,
+)
+from ..starlette_utils import (
     add_starlette_http_db_session_middleware,
     starlette_http_db_session_middleware,
 )
 
 
-def add_fastapi_http_db_session_middleware(app: FastAPI) -> None:
+def add_fastapi_http_db_session_middleware(
+    app: FastAPI,
+    before_commit: BeforeCommitCallback | None = None,
+) -> None:
     """Adds middleware to the application"""
-    add_starlette_http_db_session_middleware(app)
+    add_starlette_http_db_session_middleware(
+        app,
+        before_commit=before_commit,
+    )
 
 
 async def fastapi_http_db_session_middleware(
-    request: Request, call_next: RequestResponseEndpoint
+    request: Request,
+    call_next: RequestResponseEndpoint,
+    before_commit: BeforeCommitCallback | None = None,
 ) -> Response:
     """
     Database session lifecycle management.
@@ -28,4 +39,8 @@ async def fastapi_http_db_session_middleware(
 
     But you can commit or rollback manually in the handler.
     """
-    return await starlette_http_db_session_middleware(request, call_next)
+    return await starlette_http_db_session_middleware(
+        request,
+        call_next,
+        before_commit=before_commit,
+    )

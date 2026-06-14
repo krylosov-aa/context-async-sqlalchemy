@@ -1,16 +1,25 @@
+from collections.abc import Callable, Coroutine
 from http import HTTPStatus
+from typing import Any
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .context import sessions_stream
 
+BeforeCommitCallback = Callable[[AsyncSession], Coroutine[Any, Any, None]]
 
-async def auto_commit_by_status_code(status_code: int) -> None:
+
+async def auto_commit_by_status_code(
+    status_code: int,
+    before_commit: BeforeCommitCallback | None = None,
+) -> None:
     """
     Implements automatic commit or rollback.
     It should be used in a middleware or anywhere else where you expect
         session lifecycle management.
     """
     if status_code < HTTPStatus.BAD_REQUEST:
-        await commit_all_sessions()
+        await commit_all_sessions(before_commit)
     else:
         await rollback_all_sessions()
 
@@ -28,7 +37,9 @@ async def rollback_all_sessions() -> None:
             await session.rollback()
 
 
-async def commit_all_sessions() -> None:
+async def commit_all_sessions(
+    before_commit: BeforeCommitCallback | None = None,
+) -> None:
     """
     Commits all open context sessions.
 
@@ -37,6 +48,8 @@ async def commit_all_sessions() -> None:
     """
     for session in sessions_stream():
         if session.in_transaction():
+            if before_commit is not None:
+                await before_commit(session)
             await session.commit()
 
 

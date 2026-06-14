@@ -208,6 +208,104 @@ async def _insert_non_ctx_manual() -> None:
         await session.commit()
 ```
 
+### Read Your Own Writes
+
+The "Read Your Own Writes" pattern ensures that after a write request, subsequent read requests
+always see the data that was just written — even when reads are served by a replica.
+
+The implementation uses the PostgreSQL WAL LSN (Log Sequence Number).
+After a write transaction the current LSN is captured via `before_commit` and sent to the client
+as a cookie.
+On the next read the client echoes the cookie back, and The application can use LSN
+to select which replica to send a request to (the one that has already caught up) or
+send it to the master if no replica has caught up yet.
+
+**Step 1 — capture the LSN in `before_commit`**
+
+```python
+from contextvars import ContextVar
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+class _LsnHolder:
+    """
+    The holder is needed so that the nested context can update the lsn value,
+        which will then be visible in the middleware context.
+    """
+    value: str | None = None
+
+
+_request_lsn: ContextVar[_LsnHolder] = ContextVar("_request_lsn")
+
+
+async def save_current_lsn_if_there_writes(session: AsyncSession) -> None:
+    """before_commit callback: saves the WAL LSN if the session had writes."""
+    # pg_current_xact_id_if_assigned() returns NULL for read-only sessions
+    result = await session.execute(
+        text(
+            "SELECT pg_current_wal_lsn()::text "
+            "WHERE pg_current_xact_id_if_assigned() IS NOT NULL"
+        )
+    )
+    lsn = result.scalar()
+    if lsn:
+        _request_lsn.get().value = lsn
+```
+
+**Step 2 — expose the LSN as a cookie via a lightweight middleware**
+
+```python
+from starlette.middleware.base import RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
+
+
+async def lsn_cookie_middleware(
+    request: Request, call_next: RequestResponseEndpoint
+) -> Response:
+    holder = _LsnHolder()
+    _request_lsn.set(holder)
+
+    response = await call_next(request)
+    if holder.value:
+        response.headers["Set-Cookie"] = (
+            f"X-WAL-LSN={holder.value}; Path=/; SameSite=Lax; Secure"
+        )
+    return response
+```
+
+**Step 3 — wire everything together**
+
+```python
+from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
+from context_async_sqlalchemy.fastapi_utils import add_fastapi_http_db_session_middleware
+
+app = FastAPI(...)
+
+add_fastapi_http_db_session_middleware(
+    app,
+    before_commit=save_current_lsn_if_there_writes,
+)
+app.add_middleware(BaseHTTPMiddleware, dispatch=lsn_cookie_middleware)
+```
+
+The full, runnable implementation is available in
+[examples/fastapi_example/read_own_writes.py](../../examples/fastapi_example/read_own_writes.py).
+
+**Step 4 — route reads to the right replica**
+
+This example does not cover how to select a replica that has already caught up to the LSN from
+the cookie. To do that you need to query each replica's current WAL replay position and compare
+it against the client-supplied LSN.
+
+The [pg-status](https://github.com/krylosov-aa/pg-status) provides a ready-made helper
+for exactly this: it lets you poll replicas and pick the first one whose replay LSN is at or
+ahead of the required value, falling back to the primary if none qualifies.
+
+---
+
 ### Rollback
 
 ```python

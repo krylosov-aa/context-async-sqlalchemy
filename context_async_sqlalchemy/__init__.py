@@ -2,6 +2,7 @@ from .asgi_utils import (
     ASGIHTTPDBSessionMiddleware,
 )
 from .auto_commit import (
+    BeforeCommitCallback,
     auto_commit_by_status_code,
     close_all_sessions,
     commit_all_sessions,
@@ -31,6 +32,7 @@ from .session import (
 
 __all__ = [
     "ASGIHTTPDBSessionMiddleware",
+    "BeforeCommitCallback",
     "ContextAlreadyInitiatedError",
     "ContextNotInitiatedError",
     "DBConnect",

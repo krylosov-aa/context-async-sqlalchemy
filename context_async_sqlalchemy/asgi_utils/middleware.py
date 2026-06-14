@@ -2,7 +2,11 @@ from collections.abc import Awaitable, Callable, MutableMapping
 from http import HTTPStatus
 from typing import Any
 
-from ..auto_commit import auto_commit_by_status_code, rollback_all_sessions
+from ..auto_commit import (
+    BeforeCommitCallback,
+    auto_commit_by_status_code,
+    rollback_all_sessions,
+)
 from ..context import (
     init_db_session_ctx,
     is_context_initiated,
@@ -19,8 +23,13 @@ ASGIApp = Callable[[Scope, Receive, Send], Awaitable[None]]
 class ASGIHTTPDBSessionMiddleware:
     """Database session lifecycle management."""
 
-    def __init__(self, app: ASGIApp):
+    def __init__(
+        self,
+        app: ASGIApp,
+        before_commit: BeforeCommitCallback | None = None,
+    ):
         self.app = app
+        self._before_commit = before_commit
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send
@@ -63,7 +72,10 @@ class ASGIHTTPDBSessionMiddleware:
             await self.app(scope, receive, send_wrapper)
             # using the status code, we decide to commit or rollback
             # all sessions
-            await auto_commit_by_status_code(status_code)
+            await auto_commit_by_status_code(
+                status_code=status_code,
+                before_commit=self._before_commit,
+            )
         except Exception:
             # If an exception occurs, we roll all sessions back
             await rollback_all_sessions()
